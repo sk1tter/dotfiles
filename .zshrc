@@ -12,6 +12,12 @@ source ~/powerlevel10k/powerlevel10k.zsh-theme
 
 export COPYFILE_DISABLE=true
 
+export EDITOR='nvim'
+
+# JAVA_HOME variable
+export JAVA_HOME=$(/usr/libexec/java_home)
+
+export BAT_THEME="Nord"
 # colored ls and cd <tab> completion
 export CLICOLOR=1
 #export LSCOLORS="Gxfxcxdxbxegedabagacad"
@@ -36,11 +42,10 @@ alias ll='ls -l'
 alias vi='\vim'
 alias vim='nvim'
 
-export EDITOR='nvim'
+# source control dotfiles directory with alias dotfiles
+alias dotfiles='/usr/local/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 
-# JAVA_HOME variable
-export JAVA_HOME=$(/usr/libexec/java_home)
-
+# pretty git graph
 alias gitv='git log --graph --format="%C(auto)%h%d %s %C(black)%C(bold)%cr"'
 
 

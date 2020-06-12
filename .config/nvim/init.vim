@@ -1,24 +1,15 @@
-" vim: set foldmethod=marker foldlevel=0 nomodeline:
-" ============================================================================
-" vim configurations {{{
-" ============================================================================
-
 augroup vimrc
-	autocmd!
+    autocmd!
 augroup END
 
 
 let mapleader      = ' '
 let maplocalleader = ' '
 
-" }}}
-" ============================================================================
-" VIM-PLUG BLOCK {{{
-" ============================================================================
 
 silent! if plug#begin('~/.vim/plugged')
 
-Plug 'junegunn/fzf' 
+Plug 'junegunn/fzf'
 Plug 'junegunn/fzf.vim'
 
 " auto close brackets
@@ -26,6 +17,16 @@ Plug 'Raimondi/delimitMate'
 
 " Colors
 Plug 'arcticicestudio/nord-vim'
+Plug 'morhetz/gruvbox'
+    let g:gruvbox_contrast_dark = 'soft'
+Plug 'tyrannicaltoucan/vim-deep-space'
+Plug 'AlessandroYorba/Despacio'
+Plug 'cocopon/iceberg.vim'
+Plug 'nightsense/snow'
+Plug 'nightsense/stellarized'
+Plug 'nightsense/cosmic_latte'
+Plug 'junegunn/seoul256.vim'
+
 
 Plug 'itchyny/lightline.vim'
 
@@ -39,16 +40,17 @@ Plug 'mbbill/undotree', { 'on': 'UndotreeToggle' }
 
 Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
     augroup nerd_loader
-      autocmd!
-      autocmd VimEnter * silent! autocmd! FileExplorer
-      autocmd BufEnter,BufNew *
+        autocmd!
+        autocmd VimEnter * silent! autocmd! FileExplorer
+        autocmd BufEnter,BufNew *
             \  if isdirectory(expand('<amatch>'))
             \|   call plug#load('nerdtree')
             \|   execute 'autocmd! nerd_loader'
             \| endif
     augroup END
-	let NERDTreeShowHidden=1
-	let NERDTreeIgnore=['\.git$', '\.bloop$', '\.metals$', '\.DS_Store$', '\.vscode$', '^__pycache__$']
+    let g:NERDTreeStatusline = '%#NonText#'
+    let NERDTreeShowHidden=1
+    let NERDTreeIgnore=['\.git$', '\.bloop$', '\.metals$', '\.DS_Store$', '\.vscode$', '^__pycache__$']
 
 Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
 
@@ -58,6 +60,13 @@ Plug 'ryanoasis/vim-devicons'
 Plug 'tpope/vim-fugitive'
     nmap     <Leader>g :Gstatus<CR>gg<c-n>
     nnoremap <Leader>d :Gdiff<CR>
+
+Plug 'mhinz/vim-signify'
+    let g:signify_sign_show_text = 1
+    let g:signify_sign_add               = '│'
+    let g:signify_sign_delete            = '│'
+    let g:signify_sign_delete_first_line = '│'
+    let g:signify_sign_change            = '│'
 
 " Languages
 Plug 'fatih/vim-go', { 'do': ':GoInstallBinaries' }
@@ -70,26 +79,17 @@ Plug 'neoclide/coc.nvim',  {'branch': 'release'}
 call plug#end()
 endif
 
-" }}}
-" ============================================================================
-" BASIC SETTINGS {{{
-" ============================================================================
-
 set langmenu=en_US
 set encoding=utf-8
 
-if !has('gui_running')
-  set t_Co=256
-endif
-
-set nu
+set number
 set autoindent
+set laststatus=2
 set tabstop=4
 set shiftwidth=4
-set laststatus=2
 set expandtab smarttab
-set visualbell
 set backspace=indent,eol,start
+set ruler
 
 " colorscheme nord
 silent! colo nord
@@ -125,15 +125,15 @@ set mouse=a
 filetype plugin indent on
 autocmd FileType scala setlocal shiftwidth=4 softtabstop=4 expandtab
 
+" 120 chars/line
+set textwidth=0
+if exists('&colorcolumn')
+  set colorcolumn=120
+endif
 
-" }}}
-" ============================================================================
-" MAPPINGS {{{
-" ============================================================================
+" Keep the cursor on the same column
+set nostartofline
 
-" ----------------------------------------------------------------------------
-" Basic mappings
-" ----------------------------------------------------------------------------
 
 " split navigations
 nnoremap <C-J> <C-W><C-J>
@@ -156,90 +156,86 @@ nnoremap [b :bprev<cr>
 nnoremap ]t :tabn<cr>
 nnoremap [t :tabp<cr>
 
-" }}}
-" ============================================================================
-" FUNCTIONS & COMMANDS {{{
-" ============================================================================
+" qq to record, Q to replay
+nnoremap Q @q
 
-let s:term_buf = 0
-let s:term_win = 0
+if has("nvim")
+    let s:term_buf = 0
+    let s:term_win = 0
 
-function! TermToggle(height)
-    if win_gotoid(s:term_win)
-        hide
-    else
-    setlocal splitbelow
-        new terminal
-        exec "resize ".a:height
-        try
-            exec "buffer ".s:term_buf
-            exec "bd terminal"
-        catch
-            call termopen($SHELL, {"detach": 0})
-            let s:term_buf = bufnr("")
-            setlocal nonu nornu scl=no nocul
-        endtry
-        startinsert!
-        let s:term_win = win_getid()
-    endif
-endfunction
+    function! TermToggle(height) abort
+        if win_gotoid(s:term_win)
+            hide
+        else
+            setlocal splitbelow
+            new terminal
+            exec "resize ".a:height
+            try
+                exec "buffer ".s:term_buf
+                exec "bd terminal"
+            catch
+                call termopen($SHELL, {"detach": 0})
+                let s:term_buf = bufnr("")
+                setlocal nonu nornu scl=no nocul
+            endtry
+            startinsert!
+            let s:term_win = win_getid()
+        endif
+    endfunction
 
-nnoremap <silent><leader><C-T> :call TermToggle(12)<CR>
-tnoremap <silent><leader><C-T> <C-\><C-n>:call TermToggle(12)<CR>
+    nnoremap <silent><leader><C-T> :call TermToggle(12)<CR>
+    tnoremap <silent><leader><C-T> <C-\><C-n>:call TermToggle(12)<CR>
+endif
 
-" }}}
-" ============================================================================
-" PLUGINS {{{
-" ============================================================================
 
 " ----------------------------------------------------------------------------
 " lightline statusbar
 " ----------------------------------------------------------------------------
 let g:lightline = {
-		\ 'colorscheme': 'nord',
-		\ 'active': {
-		\   'left': [ [ 'mode', 'paste' ], [ 'fugitive', 'filename' ], [ 'cocstatus', 'currentfunction' ] ],
-		\   'right': [ [ 'lineinfo' ],
-		\            [ 'percent' ],
-		\            [ 'fileformat', 'fileencoding', 'filetypeIcon' ] ]
-		\ },
-		\ 'component_function': {
-		\   'fugitive': 'LightlineFugitive',
-		\   'filename': 'LightlineFilename',
-    	\   'cocstatus': 'coc#status',
+    \ 'colorscheme': g:colors_name,
+        \ 'active': {
+        \   'left': [ [ 'mode', 'paste' ], [ 'fugitive', 'filename' ], [ 'cocstatus', 'currentfunction' ] ],
+        \   'right': [ [ 'lineinfo' ],
+        \            [ 'percent' ],
+        \            [ 'fileformat', 'fileencoding', 'filetypeIcon' ] ]
+        \ },
+        \ 'component_function': {
+        \   'fugitive': 'LightlineFugitive',
+        \   'filename': 'LightlineFilename',
+        \   'cocstatus': 'coc#status',
         \   'currentfunction': 'CocCurrentFunction',
-		\   'filetypeIcon': 'FileTypeIcon'
-		\ },
-		\ 'separator': { 'left': "\ue0b0", 'right': "\ue0b2" },
-		\ 'subseparator': { 'left': "\ue0b1", 'right': "\ue0b3" }
-		\ }
-	function! LightlineModified()
-		return &ft =~# 'help\|vimfiler' ? '' : &modified ? '+' : &modifiable ? '' : '-'
-	endfunction
-	function! LightlineReadonly()
-		return &ft !~? 'help\|vimfiler' && &readonly ? '' : ''
-	endfunction
-	function! LightlineFilename()
-		return winwidth(0) > 70 ? ((LightlineReadonly() !=# '' ? LightlineReadonly() . ' ' : '') .
-		\ (&ft ==# 'vimfiler' ? vimfiler#get_status_string() :
-		\  &ft ==# 'unite' ? unite#get_status_string() :
-		\  &ft ==# 'vimshell' ? vimshell#get_status_string() :
-		\ expand('%:t') !=# '' ? expand('%:t') : '[No Name]') .
-		\ (LightlineModified() !=# '' ? ' ' . LightlineModified() : '')) : ''
-	endfunction
-	function! LightlineFugitive()
-		if &ft !~? 'vimfiler' && exists('*FugitiveHead')
-			let branch = FugitiveHead()
-			return branch !=# '' ? '⎇ '.branch : ''
-		endif
-		return ''
-	endfunction
-	function! CocCurrentFunction()
-    	return winwidth(0) > 120 ? (get(b:, 'coc_current_function', '')) : ''
-	endfunction
-	function! FileTypeIcon()
-	  return winwidth(0) > 70 ? (strlen(&filetype) ? &filetype . ' ' . WebDevIconsGetFileTypeSymbol() : 'no ft') : ''
-	endfunction
+        \   'filetypeIcon': 'FileTypeIcon'
+        \ },
+        \ 'separator': { 'left': "\ue0b0", 'right': "\ue0b2" },
+        \ 'subseparator': { 'left': "\ue0b1", 'right': "\ue0b3" }
+        \ }
+    function! LightlineModified()
+        return &ft =~# 'help\|vimfiler' ? '' : &modified ? '+' : &modifiable ? '' : '-'
+    endfunction
+    function! LightlineReadonly()
+        return &ft !~? 'help\|vimfiler' && &readonly ? '' : ''
+    endfunction
+    function! LightlineFilename()
+        return winwidth(0) > 70 ? ((LightlineReadonly() !=# '' ? LightlineReadonly() . ' ' : '') .
+        \ (&ft ==# 'vimfiler' ? vimfiler#get_status_string() :
+        \  &ft ==# 'unite' ? unite#get_status_string() :
+        \  &ft ==# 'vimshell' ? vimshell#get_status_string() :
+        \ expand('%:t') !=# '' ? expand('%:t') : '[No Name]') .
+        \ (LightlineModified() !=# '' ? ' ' . LightlineModified() : '')) : ''
+    endfunction
+    function! LightlineFugitive()
+        if &ft !~? 'vimfiler' && exists('*FugitiveHead')
+            let branch = FugitiveHead()
+            return branch !=# '' ? '⎇ '.branch : ''
+        endif
+        return ''
+    endfunction
+    function! CocCurrentFunction()
+        return winwidth(0) > 70 ? (get(b:, 'coc_current_function', '')) : ''
+    endfunction
+    function! FileTypeIcon()
+        return winwidth(0) > 70 ? (strlen(&filetype) ? &filetype . ' ' . WebDevIconsGetFileTypeSymbol() : 'no ft') : ''
+    endfunction
 " ----------------------------------------------------------------------------
 " coc.nvim
 " ----------------------------------------------------------------------------
@@ -250,23 +246,23 @@ if has_key(g:plugs, 'coc.nvim')
     endfunction
 
     inoremap <silent><expr> <TAB>
-          \ pumvisible() ? "\<C-n>" :
-          \ <SID>check_back_space() ? "\<TAB>" :
-          \ coc#refresh()
+        \ pumvisible() ? "\<C-n>" :
+        \ <SID>check_back_space() ? "\<TAB>" :
+        \ coc#refresh()
     inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
 
     function! s:show_documentation()
-	if (index(['vim', 'help'], &filetype) >= 0)
+        if (index(['vim', 'help'], &filetype) >= 0)
             execute 'h' expand('<cword>')
         else
             call CocAction('doHover')
         endif
-     endfunction
+    endfunction
 
     nnoremap <silent> K :call <SID>show_documentation()<CR>
 
     let g:go_doc_keywordprg_enabled = 0
-	let g:go_def_mapping_enabled = 0
+    let g:go_def_mapping_enabled = 0
 
     augroup coc-config
         autocmd!
@@ -276,12 +272,12 @@ if has_key(g:plugs, 'coc.nvim')
     augroup END
 endif
 
-" }}}
-" ============================================================================
-" FZF {{{
-" ============================================================================
+" ----------------------------------------------------------------------------
+" FZF
+" ----------------------------------------------------------------------------
 
 let $FZF_DEFAULT_OPTS .= ' --inline-info'
+" let g:fzf_layout = { 'window': { 'width': 0.6, 'height': 0.3 } }
 
 " All files
 command! -nargs=? -complete=dir AF
@@ -290,7 +286,7 @@ command! -nargs=? -complete=dir AF
     \ })))
 
 let g:fzf_colors =
-\ { 'fg':      ['fg', 'Normal'],
+    \ { 'fg':      ['fg', 'Normal'],
     \ 'bg':      ['bg', 'Normal'],
     \ 'hl':      ['fg', 'Comment'],
     \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
@@ -314,16 +310,39 @@ nnoremap <silent> <Leader>L        :Lines<CR>
 nnoremap <silent> <Leader>rg       :Rg <C-R><C-W><CR>
 
 function! RipgrepFzf(query, fullscreen)
-  let command_fmt = 'rg --column --line-number --no-heading --color=always --smart-case %s || true'
-  let initial_command = printf(command_fmt, shellescape(a:query))
-  let reload_command = printf(command_fmt, '{q}')
-  let options = {'options': ['--phony', '--query', a:query, '--bind', 'change:reload:'.reload_command]}
-  if a:fullscreen
-    let options = fzf#vim#with_preview(options)
-  endif
-  call fzf#vim#grep(initial_command, 1, options, a:fullscreen)
+    let command_fmt = 'rg --column --line-number --no-heading --color=always --smart-case %s || true'
+    let initial_command = printf(command_fmt, shellescape(a:query))
+    let reload_command = printf(command_fmt, '{q}')
+    let options = {'options': ['--phony', '--query', a:query, '--bind', 'change:reload:'.reload_command]}
+    if a:fullscreen
+        let options = fzf#vim#with_preview(options)
+    endif
+    call fzf#vim#grep(initial_command, 1, options, a:fullscreen)
 endfunction
 
 command! -nargs=* -bang RG call RipgrepFzf(<q-args>, <bang>0)
+
+
+augroup vimrc
+    au BufNewFile,BufRead Dockerfile*         set filetype=dockerfile
+
+    highlight ExtraWhitespace ctermbg=red guibg=red
+
+    au BufNewFile,BufRead,InsertLeave * silent! match ExtraWhitespace /\s\+$/
+    au InsertEnter * silent! match ExtraWhitespace /\s\+\%#\@<!$/
+
+    au FileType gitcommit setlocal spell textwidth=72
+augroup END
+
+" ----------------------------------------------------------------------------
+" Help in new tabs
+" ----------------------------------------------------------------------------
+function! s:helptab()
+    if &buftype == 'help'
+        wincmd T
+        nnoremap <buffer> q :q<cr>
+    endif
+endfunction
+autocmd vimrc BufEnter *.txt call s:helptab()
 
 
