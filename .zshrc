@@ -48,7 +48,44 @@ alias dotfiles='/usr/local/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 # pretty git graph
 alias gitv='git log --graph --format="%C(auto)%h%d %s %C(black)%C(bold)%cr"'
 
+emrtest() {
+    BUCKET=${1:="delphi_test"}
+    if [ -e build.sbt ]; then
+        sbt compile assembly
+        if [ $? -eq 0 ]; then
+            if command -v aws > /dev/null; then
+                aws s3 cp ./target/scala-2.11/data-batch-assembly-0.1.0-SNAPSHOT.jar s3://bucketplace-emr/$BUCKET/data-batch-assembly-0.1.0-SNAPSHOT.jar
+            else
+                echo "aws not found! opening aws console"
+                open https://ap-northeast-2.console.aws.amazon.com/console/home\?region=ap-northeast-2#
+            fi
+        else
+            echo "compile fail!"
+        fi
+    else
+        echo "Not a sbt project"
+    fi
+}
 
+
+awsc() {
+    open https://ap-northeast-2.console.aws.amazon.com/console/home\?region=ap-northeast-2#
+}
+
+google() {
+  open "https://www.google.com/search?q="$1
+}
+
+github() {(
+    set -e
+    git remote -v | grep push
+    remote=${1:-origin}
+    echo "Using remote $remote"
+
+    URL=$(git config remote.$remote.url | sed "s/git@\(.*\):\(.*\).git/https:\/\/\1\/\2/")
+    echo "Opening $URL..."
+    open $URL
+)}
 
 [ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
 # ###
@@ -102,7 +139,7 @@ fh() {
   eval $( ([ -n "$ZSH_NAME" ] && fc -l 1 || history) | fzf +s --tac | sed 's/ *[0-9]* *//')
 }
 
-# fzf cd 
+# fzf cd
 function cd() {
     if [[ "$#" != 0 ]]; then
         builtin cd "$@";
@@ -226,3 +263,9 @@ unset -f bind-git-helper
 source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
 # syntax highlighting : must be at end of zshrc
 source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+autoload compinit && compinit
+autoload bashcompinit && bashcompinit
+source ~/.bash_completion.d/breeze-complete
+autoload compinit && compinit
+autoload bashcompinit && bashcompinit
+source ~/.bash_completion.d/breeze-complete
