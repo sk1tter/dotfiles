@@ -23,7 +23,6 @@ set scrolloff=5
 set list
 set listchars=tab:\|\ ,
 set autoread
-set foldlevelstart=99
 
 set modelines=2
 set synmaxcol=1000
@@ -94,29 +93,31 @@ let g:netrw_altv=1          " open splits to the right
 let g:netrw_liststyle=3     " tree view
 
 
-let g:terminal_drawer = { 'win_id': v:null, 'buffer_id': v:null }
-function! TermToggle() abort
-    if win_gotoid(g:terminal_drawer.win_id)
-        hide
-        set laststatus=2 showmode ruler
-    else
-    if !g:terminal_drawer.buffer_id
-        botright call term_start($SHELL)
-        let g:terminal_drawer.buffer_id = bufnr("$")
-    else
-        execute 'botright sbuffer' . g:terminal_drawer.buffer_id
-        exec 'normal! i'
-    endif
+if has('terminal')
+    let g:terminal_drawer = { 'win_id': v:null, 'buffer_id': v:null }
+    function! TermToggle() abort
+        if win_gotoid(g:terminal_drawer.win_id)
+            hide
+            set laststatus=2 showmode ruler
+        else
+        if !g:terminal_drawer.buffer_id
+            botright call term_start($SHELL)
+            let g:terminal_drawer.buffer_id = bufnr("$")
+        else
+            execute 'botright sbuffer' . g:terminal_drawer.buffer_id
+            exec 'normal! i'
+        endif
+    
+        exec "resize" float2nr(&lines * 0.25)
+        setlocal laststatus=0 noshowmode noruler
+        setlocal nobuflisted
+        let g:terminal_drawer.win_id = win_getid()
+        endif
+    endfunction
 
-    exec "resize" float2nr(&lines * 0.25)
-    setlocal laststatus=0 noshowmode noruler
-    setlocal nobuflisted
-    let g:terminal_drawer.win_id = win_getid()
-    endif
-endfunction
-
-nnoremap <silent><leader><C-T> :call TermToggle()<CR>
-tnoremap <silent><leader><C-T> <C-\><C-n>:call TermToggle()<CR>
+    nnoremap <silent><leader><C-T> :call TermToggle()<CR>
+    tnoremap <silent><leader><C-T> <C-\><C-n>:call TermToggle()<CR>
+endif
 
 
 function! s:helptab()

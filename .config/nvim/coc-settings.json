@@ -1,8 +1,9 @@
 {
     "diagnostic.errorSign": "✘",
     "diagnostic.warningSign": "⚠",
-    "metals.statusBarEnabled": true,
     "diagnostic.checkCurrentLine": true,
-    "python.jediEnabled": false
+    "python.jediEnabled": false,
+    "metals.statusBarEnabled": true,
+    "codeLens.enable": true
 }
 

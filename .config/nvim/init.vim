@@ -2,10 +2,8 @@ augroup vimrc
     autocmd!
 augroup END
 
-
 let mapleader      = ' '
 let maplocalleader = ' '
-
 
 silent! if plug#begin('~/.vim/plugged')
 
@@ -54,6 +52,10 @@ Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 
 Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
 
+Plug 'majutsushi/tagbar', { 'on': 'TagbarToggle' }
+  let g:tagbar_sort = 0
+  nnoremap <silent><F8> :TagbarToggle<CR>
+
 Plug 'ryanoasis/vim-devicons'
 
 " Git
@@ -75,6 +77,12 @@ Plug 'derekwyatt/vim-scala'
 " lsp
 Plug 'neoclide/coc.nvim',  {'branch': 'release'}
 
+" lint
+Plug 'dense-analysis/ale'
+    let g:ale_linters = {'scala': ['scalastyle'], 'python': ['flake8']}
+    let g:ale_lint_delay = 1000
+    nmap ]a <Plug>(ale_next_wrap)
+    nmap [a <Plug>(ale_previous_wrap)
 
 call plug#end()
 endif
@@ -106,6 +114,7 @@ set list
 set listchars=tab:\|\ ,
 set autoread
 set foldlevelstart=99
+set virtualedit=block
 
 let &showbreak = '↳ '
 set breakindent
@@ -122,6 +131,9 @@ set clipboard=unnamed
 silent! set ttymouse=xterm2
 set mouse=a
 
+" ctags
+set tags=./tags;/
+
 filetype plugin indent on
 autocmd FileType scala setlocal shiftwidth=4 softtabstop=4 expandtab
 
@@ -134,7 +146,6 @@ endif
 " Keep the cursor on the same column
 set nostartofline
 
-
 " split navigations
 nnoremap <C-J> <C-W><C-J>
 nnoremap <C-K> <C-W><C-K>
@@ -142,28 +153,28 @@ nnoremap <C-L> <C-W><C-L>
 nnoremap <C-H> <C-W><C-H>
 
 " <leader>n | NERD Tree
-nnoremap <leader>n :NERDTreeToggle<cr>
+nnoremap <silent><leader>n :NERDTreeToggle<cr>
 
-" ----------------------------------------------------------------------------
 " Buffers
-" ----------------------------------------------------------------------------
 nnoremap ]b :bnext<cr>
 nnoremap [b :bprev<cr>
 
-" ----------------------------------------------------------------------------
 " Tabs
-" ----------------------------------------------------------------------------
 nnoremap ]t :tabn<cr>
 nnoremap [t :tabp<cr>
+
+"Remove all trailing whitespace by pressing F5
+nnoremap <silent><F5> :let _s=@/<Bar>:%s/\s\+$//e<Bar>:let @/=_s<Bar><CR>:noh<CR>
 
 " qq to record, Q to replay
 nnoremap Q @q
 
+" nvim toggle terminal
 if has("nvim")
     let s:term_buf = 0
     let s:term_win = 0
 
-    function! TermToggle(height) abort
+    function! s:TermToggle(height) abort
         if win_gotoid(s:term_win)
             hide
         else
@@ -183,14 +194,12 @@ if has("nvim")
         endif
     endfunction
 
-    nnoremap <silent><leader><C-T> :call TermToggle(12)<CR>
-    tnoremap <silent><leader><C-T> <C-\><C-n>:call TermToggle(12)<CR>
+    nnoremap <silent><leader>t :call <SID>TermToggle(12)<CR>
+    tnoremap <silent><leader>t <C-\><C-n>:call <SID>TermToggle(12)<CR>
 endif
 
 
-" ----------------------------------------------------------------------------
 " lightline statusbar
-" ----------------------------------------------------------------------------
 let g:lightline = {
     \ 'colorscheme': g:colors_name,
         \ 'active': {
@@ -209,36 +218,40 @@ let g:lightline = {
         \ 'separator': { 'left': "\ue0b0", 'right': "\ue0b2" },
         \ 'subseparator': { 'left': "\ue0b1", 'right': "\ue0b3" }
         \ }
-    function! LightlineModified()
-        return &ft =~# 'help\|vimfiler' ? '' : &modified ? '+' : &modifiable ? '' : '-'
-    endfunction
-    function! LightlineReadonly()
-        return &ft !~? 'help\|vimfiler' && &readonly ? '' : ''
-    endfunction
-    function! LightlineFilename()
-        return winwidth(0) > 70 ? ((LightlineReadonly() !=# '' ? LightlineReadonly() . ' ' : '') .
-        \ (&ft ==# 'vimfiler' ? vimfiler#get_status_string() :
-        \  &ft ==# 'unite' ? unite#get_status_string() :
-        \  &ft ==# 'vimshell' ? vimshell#get_status_string() :
-        \ expand('%:t') !=# '' ? expand('%:t') : '[No Name]') .
-        \ (LightlineModified() !=# '' ? ' ' . LightlineModified() : '')) : ''
-    endfunction
-    function! LightlineFugitive()
-        if &ft !~? 'vimfiler' && exists('*FugitiveHead')
-            let branch = FugitiveHead()
-            return branch !=# '' ? '⎇ '.branch : ''
-        endif
-        return ''
-    endfunction
-    function! CocCurrentFunction()
-        return winwidth(0) > 70 ? (get(b:, 'coc_current_function', '')) : ''
-    endfunction
-    function! FileTypeIcon()
-        return winwidth(0) > 70 ? (strlen(&filetype) ? &filetype . ' ' . WebDevIconsGetFileTypeSymbol() : 'no ft') : ''
-    endfunction
-" ----------------------------------------------------------------------------
+function! LightlineModified()
+    return &ft =~# 'help\|vimfiler' ? '' : &modified ? '+' : &modifiable ? '' : '-'
+endfunction
+
+function! LightlineReadonly()
+    return &ft !~? 'help\|vimfiler' && &readonly ? '' : ''
+endfunction
+
+function! LightlineFilename()
+    return winwidth(0) > 70 ? ((LightlineReadonly() !=# '' ? LightlineReadonly() . ' ' : '') .
+    \ (&ft ==# 'vimfiler' ? vimfiler#get_status_string() :
+    \  &ft ==# 'unite' ? unite#get_status_string() :
+    \  &ft ==# 'vimshell' ? vimshell#get_status_string() :
+    \ expand('%:t') !=# '' ? expand('%:t') : '[No Name]') .
+    \ (LightlineModified() !=# '' ? ' ' . LightlineModified() : '')) : ''
+endfunction
+
+function! LightlineFugitive()
+    if &ft !~? 'vimfiler' && exists('*FugitiveHead')
+        let branch = FugitiveHead()
+        return winwidth(0) > 70 ? (branch !=# '' ? '⎇ '.branch : '') : ''
+    endif
+    return ''
+endfunction
+
+function! CocCurrentFunction()
+    return get(b:, 'coc_current_function', '')
+endfunction
+
+function! FileTypeIcon()
+    return winwidth(0) > 70 ? (strlen(&filetype) ? &filetype . ' ' . WebDevIconsGetFileTypeSymbol() : 'no ft') : ''
+endfunction
+
 " coc.nvim
-" ----------------------------------------------------------------------------
 if has_key(g:plugs, 'coc.nvim')
     function! s:check_back_space() abort
         let col = col('.') - 1
@@ -272,10 +285,10 @@ if has_key(g:plugs, 'coc.nvim')
     augroup END
 endif
 
-" ----------------------------------------------------------------------------
-" FZF
-" ----------------------------------------------------------------------------
+" scala import sort
+let g:scala_sort_across_groups=1
 
+" FZF
 let $FZF_DEFAULT_OPTS .= ' --inline-info'
 " let g:fzf_layout = { 'window': { 'width': 0.6, 'height': 0.3 } }
 
@@ -323,6 +336,7 @@ endfunction
 command! -nargs=* -bang RG call RipgrepFzf(<q-args>, <bang>0)
 
 
+" autocmds
 augroup vimrc
     au BufNewFile,BufRead Dockerfile*         set filetype=dockerfile
 
@@ -334,9 +348,7 @@ augroup vimrc
     au FileType gitcommit setlocal spell textwidth=72
 augroup END
 
-" ----------------------------------------------------------------------------
 " Help in new tabs
-" ----------------------------------------------------------------------------
 function! s:helptab()
     if &buftype == 'help'
         wincmd T
