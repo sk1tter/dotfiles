@@ -49,6 +49,7 @@ alias gitv='git log --graph --format="%C(auto)%h%d %s %C(black)%C(bold)%cr"'
 # ctags for python
 alias python_ctags="ctags -R --fields=+l --languages=python --python-kinds=-iv -f ./tags . $(python3 -c "import os, sys; print(' '.join('{}'.format(d) for d in sys.path if os.path.isdir(d)))")"
 
+source ~/emrtest.sh
 
 awsc() {
     open https://ap-northeast-2.console.aws.amazon.com/console/home\?region=ap-northeast-2#
