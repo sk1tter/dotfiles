@@ -15,16 +15,6 @@ Plug 'Raimondi/delimitMate'
 
 " Colors
 Plug 'arcticicestudio/nord-vim'
-Plug 'morhetz/gruvbox'
-    let g:gruvbox_contrast_dark = 'soft'
-Plug 'tyrannicaltoucan/vim-deep-space'
-Plug 'AlessandroYorba/Despacio'
-Plug 'cocopon/iceberg.vim'
-Plug 'nightsense/snow'
-Plug 'nightsense/stellarized'
-Plug 'nightsense/cosmic_latte'
-Plug 'junegunn/seoul256.vim'
-
 
 Plug 'itchyny/lightline.vim'
 
@@ -50,7 +40,7 @@ Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
     let NERDTreeShowHidden=1
     let NERDTreeIgnore=['\.git$', '\.bloop$', '\.metals$', '\.DS_Store$', '\.vscode$', '^__pycache__$']
 
-Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
+Plug 'tiagofumo/vim-nerdtree-syntax-highlight', { 'on': 'NERDTreeToggle' }
 
 Plug 'majutsushi/tagbar', { 'on': 'TagbarToggle' }
   let g:tagbar_sort = 0

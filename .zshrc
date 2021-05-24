@@ -102,7 +102,7 @@ export FZF_CTRL_R_OPTS="--preview 'echo {}' --preview-window down:3:hidden:wrap 
 
 if command -v fd > /dev/null; then
     export FZF_DEFAULT_COMMAND='fd --type file --follow --hidden --exclude .git'
-    export FZF_ALT_C_COMMAND='fd --type directory --hidden --follow --exclude .git'
+    export FZF_ALT_C_COMMAND='fd --type directory --hidden --follow --exclude .git --exclude ~/Library'
     export FZF_CTRL_T_COMMAND='fd --type file --type directory --hidden --follow --exclude .git'
 fi
 
@@ -237,6 +237,31 @@ bind-git-helper() {
 bind-git-helper f b t r h
 unset -f bind-git-helper
 
+pods() {
+  local selected tokens
+  selected=$(
+    kubectl get pods --all-namespaces |
+      fzf --info=inline --layout=reverse --header-lines=1 --border \
+          --prompt "$(kubectl config current-context | sed 's/-context$//')> " \
+          --header $'Press CTRL-O to open log in editor\n\n' \
+          --bind ctrl-/:toggle-preview \
+          --bind 'ctrl-o:execute:${EDITOR:-vim} <(kubectl logs --namespace {1} {2}) > /dev/tty' \
+          --preview-window up:follow \
+          --preview 'kubectl logs --follow --tail=100000 --namespace {1} {2}' "$@"
+  )
+  read -r tokens <<< "$selected"
+  [ ${#tokens} -gt 1 ] &&
+    kubectl exec -it --namespace "${tokens[0]}" "${tokens[1]}" -- bash
+}
+
+clusters() {
+  local selected=$(
+    kubectl config get-contexts -o=name |
+      fzf-down --prompt "Current context : $(kubectl config current-context | sed 's/-context$//')> "\
+        --header $'Select new context use\n\n'
+  )
+  [ -n "$selected" ] && kubectl config use-context "$selected"
+}
 
 # ###
 # plugins
