@@ -184,8 +184,8 @@ if has("nvim")
         endif
     endfunction
 
-    nnoremap <silent><leader>t :call <SID>TermToggle(12)<CR>
-    tnoremap <silent><leader>t <C-\><C-n>:call <SID>TermToggle(12)<CR>
+    nnoremap <silent><F4> :call <SID>TermToggle(12)<CR>
+    tnoremap <silent><F4> <C-\><C-n>:call <SID>TermToggle(12)<CR>
 endif
 
 

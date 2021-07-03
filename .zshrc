@@ -17,7 +17,15 @@ export JAVA_HOME=$(/usr/libexec/java_home)
 
 # colored ls and cd <tab> completion
 export CLICOLOR=1
+
+export GOPATH=$HOME/go
+export GOROOT=/usr/local/go
+export PATH=$PATH:$GOPATH/bin
+export PATH=$PATH:$GOROOT/bin
+
 # nord LS_COLORS ?
+#
+fpath+=~/.zfunc
 zstyle ':completion:*' list-colors "${(@s.:.)LS_COLORS}"
 autoload -Uz compinit
 compinit
@@ -41,7 +49,7 @@ eval "$(hub alias -s)"
 alias ctags="`brew --prefix`/bin/ctags"
 
 # source control dotfiles directory with alias dotfiles
-alias dotfiles='/usr/local/bin/git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
+alias dotfiles='git --git-dir=$HOME/.dotfiles/ --work-tree=$HOME'
 
 # pretty git graph
 alias gitv='git log --graph --format="%C(auto)%h%d %s %C(black)%C(bold)%cr"'
@@ -102,7 +110,7 @@ export FZF_CTRL_R_OPTS="--preview 'echo {}' --preview-window down:3:hidden:wrap 
 
 if command -v fd > /dev/null; then
     export FZF_DEFAULT_COMMAND='fd --type file --follow --hidden --exclude .git'
-    export FZF_ALT_C_COMMAND='fd --type directory --hidden --follow --exclude .git --exclude ~/Library'
+    export FZF_ALT_C_COMMAND='fd --type directory --hidden --follow --exclude .git --exclude Library'
     export FZF_CTRL_T_COMMAND='fd --type file --type directory --hidden --follow --exclude .git'
 fi
 
@@ -257,11 +265,14 @@ pods() {
 clusters() {
   local selected=$(
     kubectl config get-contexts -o=name |
-      fzf-down --prompt "Current context : $(kubectl config current-context | sed 's/-context$//')> "\
-        --header $'Select new context use\n\n'
+      fzf-down -m --ansi --nth 2 \
+        --header "Current context : $(kubectl config current-context | sed 's/-context$//')> "
   )
   [ -n "$selected" ] && kubectl config use-context "$selected"
 }
+
+export PATH="$HOME/.poetry/bin:$PATH"
+eval "$(pyenv init -)"
 
 # ###
 # plugins
@@ -273,3 +284,4 @@ source ~/.zsh/zsh-colored-man-pages/zsh-colored-man-pages.plugin.zsh
 source ~/.zsh/zsh-autosuggestions/zsh-autosuggestions.zsh
 # syntax highlighting : must be at end of zshrc
 source ~/.zsh/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
