@@ -1,0 +1,9 @@
+" Remap leader key to space
+" This has to happen before any keybindings that use leader.
+noremap <space> <nop>
+let mapleader = "\<space>"
+
+source $HOME/.vim/general.vim
+source $HOME/.vim/keybindings.vim
+source $HOME/.vim/plugins.vim
+source $HOME/.vim/statusline.vim

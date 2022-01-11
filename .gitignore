@@ -1,0 +1,4 @@
+.vim/plugged/*
+.zsh/*
+!.zsh/tools
+!.zsh/zsh-colored-man-pages
