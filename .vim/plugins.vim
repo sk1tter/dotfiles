@@ -11,7 +11,7 @@ call plug#begin('~/.vim/plugged')
 if has('nvim')
     Plug 'shaunsingh/nord.nvim'
 else
-   jPlug 'arcticicestudio/nord-vim'
+    Plug 'arcticicestudio/nord-vim'
 endif
 
 Plug 'junegunn/fzf'
