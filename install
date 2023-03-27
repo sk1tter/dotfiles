@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # https://github.com/bradp/dotfiles/blob/main/misc/install
 # Set up colors.
 _colors_bold=$(tput bold)
@@ -42,11 +44,11 @@ echo -e "${_colors_green}Setting up dotfiles in ${_colors_bold}${_dotfiles_dir}$
 echo ""
 
 _files_to_symlink="
-.config/nvim/init.vim
-.vim
+.config/nvim
 .zsh
-.vimrc
-.zshrc"
+.zshrc
+.p10k.zsh
+"
 
 mkdir -p "$HOME/.config"
 

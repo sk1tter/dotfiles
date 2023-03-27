@@ -12,9 +12,6 @@ source ~/powerlevel10k/powerlevel10k.zsh-theme
 
 export EDITOR='nvim'
 
-# JAVA_HOME variable
-export JAVA_HOME=$(/usr/libexec/java_home)
-
 # colored ls and cd <tab> completion
 export CLICOLOR=1
 
@@ -46,7 +43,7 @@ alias cd.='cd ..'
 alias cd..='cd ..'
 alias l='ls -alF'
 alias ll='ls -l'
-alias vi='\vim'
+alias vi='nvim'
 alias vim='nvim'
 eval "$(hub alias -s)"
 
@@ -59,7 +56,12 @@ alias gitv='git log --graph --format="%C(auto)%h%d %s %C(black)%C(bold)%cr"'
 # ctags for python
 alias python_ctags="ctags -R --fields=+l --languages=python --python-kinds=-iv -f ./tags . $(python3 -c "import os, sys; print(' '.join('{}'.format(d) for d in sys.path if os.path.isdir(d)))")"
 
-source ~/emrtest.sh
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
+alias history="history 1"
+HISTSIZE=99999
+HISTFILESIZE=99999
+SAVEHIST=$HISTSIZE
 
 github() {(
     set -e
@@ -104,7 +106,7 @@ export FZF_CTRL_R_OPTS="--preview 'echo {}' --preview-window down:3:hidden:wrap 
 
 if command -v fd > /dev/null; then
     export FZF_DEFAULT_COMMAND='fd --type file --follow --hidden --exclude .git'
-    export FZF_ALT_C_COMMAND='fd --type directory --hidden --follow --exclude .git --exclude Library'
+    export FZF_ALT_C_COMMAND='fd --type directory --hidden --exclude .git --exclude Library'
     export FZF_CTRL_T_COMMAND='fd --type file --type directory --hidden --follow --exclude .git'
 fi
 
@@ -192,7 +194,7 @@ gt() {
     --preview 'git show --color=always {} | head -'$LINES
 }
 
-gh() {
+gl() {
   is_in_git_repo || return
   git log --date=short --format="%C(green)%C(bold)%cd %C(auto)%h%d %s (%an)" --graph --color=always |
   fzf-down --ansi --no-sort --reverse --multi --bind 'ctrl-s:toggle-sort' \
@@ -236,25 +238,8 @@ bind-git-helper() {
     eval "bindkey '^g^$c' fzf-g$c-widget"
   done
 }
-bind-git-helper f b t r h
+bind-git-helper f b t r l
 unset -f bind-git-helper
-
-pods() {
-  local selected tokens
-  selected=$(
-    kubectl get pods --all-namespaces |
-      fzf --info=inline --layout=reverse --header-lines=1 --border \
-          --prompt "$(kubectl config current-context | sed 's/-context$//')> " \
-          --header $'Press CTRL-O to open log in editor\n\n' \
-          --bind ctrl-/:toggle-preview \
-          --bind 'ctrl-o:execute:${EDITOR:-vim} <(kubectl logs --namespace {1} {2}) > /dev/tty' \
-          --preview-window up:follow \
-          --preview 'kubectl logs --follow --tail=100000 --namespace {1} {2}' "$@"
-  )
-  read -r tokens <<< "$selected"
-  [ ${#tokens} -gt 1 ] &&
-    kubectl exec -it --namespace "${tokens[0]}" "${tokens[1]}" -- bash
-}
 
 clusters() {
   local selected=$(
@@ -267,7 +252,17 @@ clusters() {
 }
 
 export PATH="$HOME/.poetry/bin:$PATH"
+export PATH="$HOME/.pyenv/bin:$PATH"
+export PATH="/usr/local/bin:$PATH"
+
+
+export PYENV_ROOT="$HOME/.pyenv" 
+export PATH="$PYENV_ROOT/bin:$PATH" 
+eval "$(pyenv init --path)"
 eval "$(pyenv init -)"
+
+export LDFLAGS="-L/usr/local/opt/zlib/lib -L/usr/local/opt/bzip2/lib"
+export CPPFLAGS="-I/usr/local/opt/zlib/include -I/usr/local/opt/bzip2/include"
 
 # ###
 # plugins
