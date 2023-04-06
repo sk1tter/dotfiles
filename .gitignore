@@ -2,3 +2,4 @@
 !.zsh/tools
 !.zsh/zsh-colored-man-pages
 .config/nvim/lazy-lock.json
+.DS_STORE
