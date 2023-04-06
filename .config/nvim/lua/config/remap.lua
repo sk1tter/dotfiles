@@ -25,8 +25,8 @@ vim.keymap.set("n", "<leader>Y", [["+Y]])
 vim.keymap.set("x", "<leader>p", [["_dP]])
 
 -- Easy window resizing
-vim.keymap.set("n", "=", [[<cmd>vertical resize +2<cr>]], { silent = true }) -- make window biger vertically
-vim.keymap.set("n", "-", [[<cmd>vertical resize -2<cr>]], { silent = true }) -- make window smaller vertically
+vim.keymap.set("n", "=", [[<cmd>vertical resize +2<cr>]], { silent = true })   -- make window biger vertically
+vim.keymap.set("n", "-", [[<cmd>vertical resize -2<cr>]], { silent = true })   -- make window smaller vertically
 vim.keymap.set("n", "+", [[<cmd>horizontal resize +2<cr>]], { silent = true }) -- make window bigger horizontally
 vim.keymap.set("n", "_", [[<cmd>horizontal resize -2<cr>]], { silent = true }) -- make window smaller horizontally
 
@@ -49,3 +49,12 @@ vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = "Go to next diagnos
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = "Open floating diagnostic message" })
 -- vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = "Open diagnostics list" })
 
+-- Move between buffers
+vim.keymap.set('n', '[b', vim.cmd.bprevious, { desc = "Move to previous buffer" })
+vim.keymap.set('n', ']b', vim.cmd.bnext, { desc = "Move to next buffer" })
+
+-- :Wq, :WQ, :W, :Q to :wq, :wq, :w, :q
+vim.api.nvim_create_user_command('WQ', 'wq', {})
+vim.api.nvim_create_user_command('Wq', 'wq', {})
+vim.api.nvim_create_user_command('W', 'w', {})
+vim.api.nvim_create_user_command('Q', 'q', {})

@@ -21,7 +21,7 @@ local on_attach = function(client, bufnr)
 
   -- See `:help K` for why this keymap
   nmap('K', vim.lsp.buf.hover, 'Hover Documentation')
-  -- nmap('<C-K>', vim.lsp.buf.signature_help, 'Signature Documentation')
+  -- nmap('<C-s>', vim.lsp.buf.signature_help, 'Signature Documentation')
 
   -- Lesser used LSP functionality
   nmap('gD', vim.lsp.buf.declaration, '[G]oto [D]eclaration')
@@ -35,6 +35,18 @@ local on_attach = function(client, bufnr)
   vim.api.nvim_buf_create_user_command(bufnr, 'Format', function(_)
     vim.lsp.buf.format()
   end, { desc = 'Format current buffer with LSP' })
+
+  -- Show Lsp signature help on cursor hold in insert mode
+  if client.supports_method "textDocument/signatureHelp" then
+    vim.api.nvim_create_autocmd({ "CursorHoldI" }, {
+      pattern = "*",
+      group = vim.api.nvim_create_augroup("LspSignature", {}),
+      callback = function()
+        vim.lsp.buf.signature_help()
+      end,
+    })
+  end
+
 end
 
 
