@@ -2,13 +2,11 @@
 -- See `:help vim.o`
 
 -- Ignore compiled files
-vim.opt.wildignore = "__pycache__"
-vim.opt.wildignore:append { "*.o", "*~", "*.pyc", "*pycache*" }
+vim.opt.wildignore:append { "*.o", "*~", "*.pyc", "*pycache*", "*/.venv/*" }
 
 -- Set highlight on search
-vim.opt.hlsearch = false
+vim.opt.hlsearch = true
 vim.opt.incsearch = true
-
 -- Make line numbers default
 vim.wo.number = true
 
@@ -54,38 +52,23 @@ vim.opt.swapfile = false
 vim.opt.scrolloff = 10
 
 -- listchars
--- vim.opt.list = true
--- vim.opt.listchars:append "eol:↴"
+vim.opt.list = true
+vim.opt.listchars:append "eol:↵"
 
+-- Set clipboard to use system clipboard
 -- vim.opt.clipboard = "unnamedplus"
 
--- [[ Highlight on yank ]]
--- See `:help vim.highlight.on_yank()`
-local highlight_group = vim.api.nvim_create_augroup('YankHighlight', { clear = true })
-vim.api.nvim_create_autocmd('TextYankPost', {
-  callback = function()
-    vim.highlight.on_yank()
-  end,
-  group = highlight_group,
-  pattern = '*',
-})
-
 -- Cursorline highlighting control
---  Only have it on in the active buffer
 vim.opt.cursorline = true -- Highlight the current line
-local group = vim.api.nvim_create_augroup("CursorLineControl", { clear = true })
-local set_cursorline = function(event, value, pattern)
-  vim.api.nvim_create_autocmd(event, {
-    group = group,
-    pattern = pattern,
-    callback = function()
-      vim.opt_local.cursorline = value
-    end,
-  })
-end
-set_cursorline("WinLeave", false)
-set_cursorline("WinEnter", true)
-set_cursorline("FileType", false, "TelescopePrompt")
+
+-- Folds
+vim.opt.foldlevel = 99 -- high flodlevel means all folds are open
+vim.opt.foldmethod = 'expr'
+vim.o.foldtext =
+[[substitute(getline(v:foldstart),'\\t',repeat('\ ',&tabstop),'g').'...'.trim(getline(v:foldend)) . ' (' . (v:foldend - v:foldstart + 1) . ' lines)']]
+vim.o.fillchars =
+[[eob: ,fold: ,foldopen:,foldsep: ,foldclose:]]
+-- vim.o.foldcolumn = '1'
 
 -- [[ Diagnostics Settings ]]
 -- “Severity signs” are signs for severity levels of problems in your code.
@@ -101,38 +84,9 @@ vim.diagnostic.config({
     -- source = "always",
     prefix = '●',
   },
+  update_in_insert = false,
   severity_sort = true,
   float = {
     source = "always", -- Or "if_many"
   },
-})
-
--- Function to check if a floating dialog exists and if not
--- then check for diagnostics under the cursor
-function OpenDiagnosticIfNoFloat()
-  for _, winid in pairs(vim.api.nvim_tabpage_list_wins(0)) do
-    if vim.api.nvim_win_get_config(winid).zindex then
-      return
-    end
-  end
-  -- THIS IS FOR BUILTIN LSP
-  vim.diagnostic.open_float({
-    scope = "cursor",
-    focusable = false,
-    close_events = {
-      "CursorMoved",
-      "CursorMovedI",
-      "BufHidden",
-      "InsertCharPre",
-      "WinLeave",
-    },
-  })
-end
-
--- Show diagnostics under the cursor when holding position
-vim.api.nvim_create_augroup("lsp_diagnostics_hold", { clear = true })
-vim.api.nvim_create_autocmd({ "CursorHold" }, {
-  pattern = "*",
-  command = "lua OpenDiagnosticIfNoFloat()",
-  group = "lsp_diagnostics_hold",
 })

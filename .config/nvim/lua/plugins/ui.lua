@@ -17,6 +17,7 @@ end
 
 -- Reuse gitsigns.nvim data for lualine
 local function diff_source()
+  ---@diagnostic disable-next-line: undefined-field
   local gitsigns = vim.b.gitsigns_status_dict
   if gitsigns then
     return {
@@ -114,13 +115,6 @@ return {
       require('bufferline').setup({
         options = {
           separator_style = "thin",
-          offsets = {
-            {
-              filetype = "undotree",
-              text = "Undo Tree",
-              separator = true -- use a "true" to enable the default, or set your own character
-            }
-          },
         },
         highlights = highlights,
       })

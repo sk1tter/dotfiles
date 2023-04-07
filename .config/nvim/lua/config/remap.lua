@@ -6,7 +6,7 @@ vim.keymap.set({ 'n', 'v' }, '<Space>', '<Nop>', { silent = true })
 
 vim.keymap.set("n", "<leader>fv", vim.cmd.Ex)
 
--- Remap for dealing with word wrap
+-- Remap for better up and down with word wrap
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 
@@ -37,7 +37,7 @@ vim.keymap.set("n", "<C-j>", "<C-w>j")
 vim.keymap.set("n", "<C-k>", "<C-w>k")
 
 -- Keymaps for terminal mode
-vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { silent = true, noremap = true })
+vim.keymap.set("t", "<Esc><Esc>", "<C-\\><C-n>", { silent = true, noremap = true, desc = "Enter Normal Mode" })
 
 -- Disable Q
 vim.keymap.set("n", "Q", "<nop>")
@@ -50,8 +50,36 @@ vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = "Open float
 -- vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = "Open diagnostics list" })
 
 -- Move between buffers
-vim.keymap.set('n', '[b', vim.cmd.bprevious, { desc = "Move to previous buffer" })
-vim.keymap.set('n', ']b', vim.cmd.bnext, { desc = "Move to next buffer" })
+if require("lazy.core.config").plugins["bufferline.nvim"] ~= nil then
+  vim.keymap.set('n', '[b', vim.cmd.BufferLineCyclePrev, { desc = "Move to previous buffer" })
+  vim.keymap.set('n', ']b', vim.cmd.BufferLineCycleNext, { desc = "Move to next buffer" })
+else
+  vim.keymap.set('n', '[b', vim.cmd.bprevious, { desc = "Move to previous buffer" })
+  vim.keymap.set('n', ']b', vim.cmd.bnext, { desc = "Move to next buffer" })
+end
+
+-- Clear search with <esc>
+vim.keymap.set({ "i", "n" }, "<esc>", "<cmd>noh<cr><esc>", { desc = "Escape and clear hlsearch" })
+
+
+-- https://github.com/mhinz/vim-galore#saner-behavior-of-n-and-n
+vim.keymap.set("n", "n", "'Nn'[v:searchforward]", { expr = true, desc = "Next search result" })
+vim.keymap.set("x", "n", "'Nn'[v:searchforward]", { expr = true, desc = "Next search result" })
+vim.keymap.set("o", "n", "'Nn'[v:searchforward]", { expr = true, desc = "Next search result" })
+vim.keymap.set("n", "N", "'nN'[v:searchforward]", { expr = true, desc = "Prev search result" })
+vim.keymap.set("x", "N", "'nN'[v:searchforward]", { expr = true, desc = "Prev search result" })
+vim.keymap.set("o", "N", "'nN'[v:searchforward]", { expr = true, desc = "Prev search result" })
+
+-- save file
+vim.keymap.set({ "i", "v", "n", "s" }, "<C-s>", "<cmd>w<cr><esc>", { desc = "Save file" })
+
+
+-- better indenting
+vim.keymap.set("v", "<", "<gv")
+vim.keymap.set("v", ">", ">gv")
+
+vim.keymap.set("n", "<leader>xl", "<cmd>lopen<cr>", { desc = "Location List" })
+vim.keymap.set("n", "<leader>xq", "<cmd>copen<cr>", { desc = "Quickfix List" })
 
 -- :Wq, :WQ, :W, :Q to :wq, :wq, :w, :q
 vim.api.nvim_create_user_command('WQ', 'wq', {})
