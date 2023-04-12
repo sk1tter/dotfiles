@@ -32,6 +32,12 @@ else
   RESET=""
 fi
 
+printf "\n${BLUE}%s${RESET}\n" "Installing p10k"
+
+git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
+
+printf "\n${BLUE}%s${RESET}\n" "Finished installing p10k"
+
 printf "\n${BLUE}%s${RESET}\n" "Installing plugins"
 
 
@@ -40,7 +46,4 @@ git clone https://github.com/zsh-users/zsh-autosuggestions ~/.zsh/zsh-autosugges
 
 git clone https://github.com/zsh-users/zsh-syntax-highlighting.git ~/.zsh/zsh-syntax-highlighting
 
-
-git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ~/powerlevel10k
-  
 printf "\n${BLUE}%s${RESET}\n" "Finished installing plugins"

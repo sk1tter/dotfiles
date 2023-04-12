@@ -1704,6 +1704,8 @@
 		<dict>
 			<key>ASCII Anti Aliased</key>
 			<true/>
+			<key>ASCII Ligatures</key>
+			<true/>
 			<key>Allow modifyOtherKeys</key>
 			<true/>
 			<key>Ambiguous Double Width</key>
@@ -2367,7 +2369,7 @@
 			<key>Normal Font</key>
 			<string>FiraCodeNerdFontCompleteM-Regular 13</string>
 			<key>Option Key Sends</key>
-			<integer>1</integer>
+			<integer>0</integer>
 			<key>Prompt Before Closing 2</key>
 			<integer>2</integer>
 			<key>Right Option Key Sends</key>

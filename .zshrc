@@ -21,7 +21,25 @@ export PATH=$PATH:$GOPATH/bin
 export PATH=$PATH:$GOROOT/bin
 export PATH=$HOME/.local/bin:$PATH
 
+export PATH="$HOME/.pyenv/bin:$PATH"
+export PATH="/usr/local/bin:$PATH"
+
+export PYENV_ROOT="$HOME/.pyenv" 
+export PATH="$PYENV_ROOT/bin:$PATH" 
+eval "$(pyenv init --path)"
+eval "$(pyenv init -)"
+
+# brew install coreutils to get gnu ls
+PATH="/opt/homebrew/opt/coreutils/libexec/gnubin:$PATH"
+MANPATH="/opt/homebrew/opt/coreutils/libexec/gnuman:$MANPATH"
+
+# colored ls
+test -r ~/.dir_colors && eval "$(dircolors -b ~/.dir_colors)"
+
 export PATH=~/.rbenv/bin:$PATH
+
+export LDFLAGS="-L/usr/local/opt/zlib/lib -L/usr/local/opt/bzip2/lib"
+export CPPFLAGS="-I/usr/local/opt/zlib/include -I/usr/local/opt/bzip2/include"
 
 
 eval "$(rbenv init -)"
@@ -40,20 +58,16 @@ alias .....='cd ../../../..'
 alias ......='cd ../../../../..'
 alias cd.='cd ..'
 alias cd..='cd ..'
+alias ls='ls --color=auto'
 alias l='ls -alF'
 alias ll='ls -l'
 alias vi='nvim'
 alias vim='nvim'
 eval "$(hub alias -s)"
-
-# user brew installed ctags
-alias ctags="`brew --prefix`/bin/ctags"
+alias which="command which"
 
 # pretty git graph
 alias gitv='git log --graph --format="%C(auto)%h%d %s %C(black)%C(bold)%cr"'
-
-# ctags for python
-alias python_ctags="ctags -R --fields=+l --languages=python --python-kinds=-iv -f ./tags . $(python3 -c "import os, sys; print(' '.join('{}'.format(d) for d in sys.path if os.path.isdir(d)))")"
 
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 
@@ -96,12 +110,13 @@ fzf-down() {
   fzf --height 50% "$@" --border
 }
 
-# export FZF_DEFAULT_OPTS='
-#     --color fg:#D8DEE9,bg:#2E3440,hl:#A3BE8C,fg+:#D8DEE9,bg+:#434C5E,hl+:#A3BE8C
-#     --color pointer:#BF616A,info:#4C566A,spinner:#4C566A,header:#4C566A,prompt:#81A1C1,marker:#EBCB8B
-# '
-
-export FZF_CTRL_R_OPTS="--preview 'echo {}' --preview-window down:3:hidden:wrap --bind '?:toggle-preview' --bind 'ctrl-y:execute-silent(echo -n {2..} | pbcopy)+abort' --header 'Press CTRL-Y to copy command into clipboard' --border"
+export FZF_DEFAULT_OPTS='--reverse --border --exact --height=50%'
+export FZF_CTRL_R_OPTS="
+  --preview 'echo {}' --preview-window down:3:hidden:wrap
+  --bind '?:toggle-preview'
+  --bind 'ctrl-y:execute-silent(echo -n {2..} | pbcopy)+abort' 
+  --color header:italic
+  --header 'Press CTRL-Y to copy command into clipboard'"
 
 if command -v fd > /dev/null; then
     export FZF_DEFAULT_COMMAND='fd --type file --follow --hidden --exclude .git'
@@ -111,14 +126,6 @@ fi
 
 command -v bat  > /dev/null && export FZF_CTRL_T_OPTS="--preview 'bat -n --color=always {}'"
 command -v tree > /dev/null && export FZF_ALT_C_OPTS="--preview 'tree --charset=unicode -C -N {} | head -200'"
-
-# fd - cd to selected directory
-#fd() {
-#  local dir
-#  dir=$(find ${1:-.} -path '*/\.*' -prune \
-#                  -o -type d -print 2> /dev/null | fzf +m) &&
-#  cd "$dir"
-#}
 
 # fh - search in your command history and execute selected command
 fh() {
@@ -145,14 +152,6 @@ function cd() {
         builtin cd "$dir" &> /dev/null
     done
 }
-
-# fe [FUZZY PATTERN] - Open the selected file with the default editor
-#   - Bypass fuzzy finder if there's only one match (--select-1)
-#   - Exit if there's no match (--exit-0)
-fe() (
-  IFS=$'\n' files=($(fzf-tmux --query="$1" --multi --select-1 --exit-0))
-  [[ -n "$files" ]] && ${EDITOR:-nvim} "${files[@]}"
-)
 
 # fco - checkout git branch/tag
 fco() {
@@ -237,7 +236,7 @@ bind-git-helper() {
     eval "bindkey '^g^$c' fzf-g$c-widget"
   done
 }
-bind-git-helper f b t r l
+bind-git-helper f b t r l s p
 unset -f bind-git-helper
 
 clusters() {
@@ -249,19 +248,6 @@ clusters() {
   )
   [ -n "$selected" ] && kubectl config use-context "$selected"
 }
-
-export PATH="$HOME/.local/bin:$PATH"
-export PATH="$HOME/.pyenv/bin:$PATH"
-export PATH="/usr/local/bin:$PATH"
-
-
-export PYENV_ROOT="$HOME/.pyenv" 
-export PATH="$PYENV_ROOT/bin:$PATH" 
-eval "$(pyenv init --path)"
-eval "$(pyenv init -)"
-
-export LDFLAGS="-L/usr/local/opt/zlib/lib -L/usr/local/opt/bzip2/lib"
-export CPPFLAGS="-I/usr/local/opt/zlib/include -I/usr/local/opt/bzip2/include"
 
 # ###
 # plugins

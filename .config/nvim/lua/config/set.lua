@@ -2,91 +2,104 @@
 -- See `:help vim.o`
 
 -- Ignore compiled files
-vim.opt.wildignore:append { "*.o", "*~", "*.pyc", "*pycache*", "*/.venv/*" }
+vim.opt.wildignore:append({ "*.o", "*~", "*.pyc", "*pycache*", "*/.venv/*", "*.DS_Store"})
 
 -- Set highlight on search
-vim.opt.hlsearch = true
-vim.opt.incsearch = true
+vim.o.hlsearch = true
+vim.o.incsearch = true
+
 -- Make line numbers default
-vim.wo.number = true
+vim.o.number = true
 
 -- Set relative line numbers
-vim.opt.relativenumber = true
+vim.o.relativenumber = true
 
 -- Enable mouse mode
-vim.opt.mouse = 'a'
+vim.o.mouse = "a"
 
-vim.opt.smartindent = true
+vim.o.smartindent = true
 
 -- Line breaking and indents
-vim.opt.breakindent = true
-vim.opt.showbreak = string.rep(" ", 3) -- Make it so that long lines wrap smartly
-vim.opt.linebreak = true
+vim.o.breakindent = true
+vim.o.showbreak = string.rep(" ", 3) -- Make it so that long lines wrap smartly
+vim.o.linebreak = true
 
 -- persistent undo
-vim.opt.undodir = os.getenv("HOME") .. "/.vim/undodir"
-vim.opt.undofile = true
+vim.o.undodir = os.getenv("HOME") .. "/.vim/undodir"
+vim.o.undofile = true
 
 -- Case insensitive searching UNLESS /C or capital in search
-vim.opt.ignorecase = true
-vim.opt.smartcase = true
+vim.o.ignorecase = true
+vim.o.smartcase = true
 
 -- Keep signcolumn on by default
-vim.wo.signcolumn = 'yes'
+vim.o.signcolumn = "yes"
 
 -- Decrease update time
-vim.opt.updatetime = 250
-vim.opt.timeout = true
-vim.opt.timeoutlen = 500
+vim.o.updatetime = 250
+vim.o.timeout = true
+vim.o.timeoutlen = 500
 
 -- Set completeopt to have a better completion experience
-vim.opt.completeopt = 'menuone,noselect'
+vim.opt.completeopt = { "menu", "menuone", "noselect" }
 
 -- NOTE: You should make sure your terminal supports this
-vim.opt.termguicolors = true
+vim.o.termguicolors = true
 
 -- No swap files, viva la vida
-vim.opt.swapfile = false
+vim.o.swapfile = false
 
 -- Make it so there are always ten lines below my cursor
-vim.opt.scrolloff = 10
+vim.o.scrolloff = 10
 
 -- listchars
-vim.opt.list = true
-vim.opt.listchars:append "eol:↵"
+vim.o.list = false
+vim.opt.listchars:append("eol:↵")
 
 -- Set clipboard to use system clipboard
--- vim.opt.clipboard = "unnamedplus"
+-- vim.o.clipboard = "unnamedplus"
 
 -- Cursorline highlighting control
-vim.opt.cursorline = true -- Highlight the current line
+vim.o.cursorline = true -- Highlight the current line
+
+-- Set tabstop to 4 spaces. Other settings are handled by vim-sleuth
+vim.o.tabstop = 4
+
+-- completion
+vim.o.pumheight = 20 -- Makes popup menu smaller
+vim.o.pumblend = 15 -- Transparent background 0 ~ 100
 
 -- Folds
-vim.opt.foldlevel = 99 -- high flodlevel means all folds are open
-vim.opt.foldmethod = 'expr'
-vim.o.foldtext =
-[[substitute(getline(v:foldstart),'\\t',repeat('\ ',&tabstop),'g').'...'.trim(getline(v:foldend)) . ' (' . (v:foldend - v:foldstart + 1) . ' lines)']]
-vim.o.fillchars =
-[[eob: ,fold: ,foldopen:,foldsep: ,foldclose:]]
--- vim.o.foldcolumn = '1'
+vim.o.foldlevel = 99 -- high flodlevel means all folds are open
+vim.o.foldmethod = "expr"
 
--- [[ Diagnostics Settings ]]
--- “Severity signs” are signs for severity levels of problems in your code.
--- By default, they are E for Error, W for Warning, H for Hints, I for Informations.
-local signs = { Error = " ", Warn = " ", Hint = " ", Info = " " }
-for type, icon in pairs(signs) do
-  local hl = "DiagnosticSign" .. type
-  vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
+-- ex) function _G.custom_fold_text() ... end (12 lines ) ----------------------
+function _G.custom_fold_text()
+	local start_line = vim.v.foldstart
+	local end_line = vim.v.foldend
+	local tabstop = vim.bo.tabstop
+	local lines_in_fold = end_line - start_line + 1
+	return vim.fn.substitute(vim.fn.getline(start_line), "\t", string.rep(" ", tabstop), "g")
+		.. " ... "
+		.. vim.fn.trim(vim.fn.getline(end_line))
+		.. " ("
+		.. lines_in_fold
+		.. " lines) "
 end
 
-vim.diagnostic.config({
-  virtual_text = {
-    -- source = "always",
-    prefix = '●',
-  },
-  update_in_insert = false,
-  severity_sort = true,
-  float = {
-    source = "always", -- Or "if_many"
-  },
-})
+vim.o.foldtext = "v:lua.custom_fold_text()"
+
+vim.opt.fillchars = {
+	foldopen = "",
+	foldclose = "",
+	fold = "-",
+	foldsep = " ",
+	diff = "╱",
+	eob = " ",
+}
+vim.o.foldcolumn = "1"
+
+vim.g.loaded_python3_provider = 0
+vim.g.loaded_perl_provider = 0
+vim.g.loaded_ruby_provider = 0
+vim.g.loaded_node_provider = 0
