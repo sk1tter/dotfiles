@@ -47,6 +47,7 @@ _files_to_symlink="
 .config/nvim
 .zsh
 .zshrc
+.vimrc
 .p10k.zsh
 "
 

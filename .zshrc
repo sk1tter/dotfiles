@@ -61,8 +61,9 @@ alias cd..='cd ..'
 alias ls='ls --color=auto'
 alias l='ls -alF'
 alias ll='ls -l'
-alias vi='nvim'
-alias vim='nvim'
+alias vi='\vim'
+alias vim='\nvim'
+alias nvim='neovide'
 eval "$(hub alias -s)"
 alias which="command which"
 
@@ -134,24 +135,24 @@ fh() {
 
 # fzf cd
 function cd() {
-    if [[ "$#" != 0 ]]; then
-        builtin cd "$@";
-        return
-    fi
-    while true; do
-        local lsd=$(echo ".." && ls -p | grep '/$' | sed 's;/$;;')
-        local dir="$(printf '%s\n' "${lsd[@]}" |
-            fzf --reverse --preview "tree --charset=unicode -C -N -L 2 {} | head -200"'
-                __cd_nxt="$(echo {})";
-                __cd_path="$(echo $(pwd)/${__cd_nxt} | sed "s;//;/;")";
-                echo $__cd_path;
-                echo;
-                ls -p -FG "${__cd_path}";
-        ')"
-        [[ ${#dir} != 0 ]] || return 0
-        builtin cd "$dir" &> /dev/null
-    done
-}
+  if [[ "$#" != 0 ]]; then
+    builtin cd "$@";
+    return
+  fi
+  while true; do
+    local lsd=$(echo ".." && ls -p | grep '/$' | sed 's;/$;;')
+    local dir="$(printf '%s\n' "${lsd[@]}" |
+      fzf --reverse --preview "tree --charset=unicode -C -N -L 2 {} | head -200"'
+          __cd_nxt="$(echo {})";
+          __cd_path="$(echo $(pwd)/${__cd_nxt} | sed "s;//;/;")";
+          echo $__cd_path;
+          echo;
+          ls -p -FG "${__cd_path}";
+          ')"
+          [[ ${#dir} != 0 ]] || return 0
+          builtin cd "$dir" &> /dev/null
+        done
+      }
 
 # fco - checkout git branch/tag
 fco() {

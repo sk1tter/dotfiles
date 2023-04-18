@@ -2,7 +2,7 @@
 -- See `:help vim.o`
 
 -- Ignore compiled files
-vim.opt.wildignore:append({ "*.o", "*~", "*.pyc", "*pycache*", "*/.venv/*", "*.DS_Store"})
+vim.opt.wildignore:append({ "*.o", "*~", "*.pyc", "*pycache*", "*.DS_Store", ".git" })
 
 -- Set highlight on search
 vim.o.hlsearch = true
@@ -16,8 +16,6 @@ vim.o.relativenumber = true
 
 -- Enable mouse mode
 vim.o.mouse = "a"
-
-vim.o.smartindent = true
 
 -- Line breaking and indents
 vim.o.breakindent = true
@@ -53,8 +51,15 @@ vim.o.swapfile = false
 vim.o.scrolloff = 10
 
 -- listchars
-vim.o.list = false
-vim.opt.listchars:append("eol:↵")
+vim.o.list = true
+vim.opt.listchars = {
+  -- eol = "↵",
+  extends = "›",
+  precedes = "‹",
+  nbsp = "␣",
+  trail = "·",
+  tab = " · ",
+}
 
 -- Set clipboard to use system clipboard
 -- vim.o.clipboard = "unnamedplus"
@@ -73,31 +78,34 @@ vim.o.pumblend = 15 -- Transparent background 0 ~ 100
 vim.o.foldlevel = 99 -- high flodlevel means all folds are open
 vim.o.foldmethod = "expr"
 
--- ex) function _G.custom_fold_text() ... end (12 lines ) ----------------------
+-- ex) function _G.custom_fold_text() ... end  ( 12 lines ) ----------------------
 function _G.custom_fold_text()
-	local start_line = vim.v.foldstart
-	local end_line = vim.v.foldend
-	local tabstop = vim.bo.tabstop
-	local lines_in_fold = end_line - start_line + 1
-	return vim.fn.substitute(vim.fn.getline(start_line), "\t", string.rep(" ", tabstop), "g")
-		.. " ... "
-		.. vim.fn.trim(vim.fn.getline(end_line))
-		.. " ("
-		.. lines_in_fold
-		.. " lines) "
+  local start_line = vim.v.foldstart
+  local end_line = vim.v.foldend
+  local tabstop = vim.bo.tabstop
+  local lines_in_fold = end_line - start_line + 1
+  return vim.fn.substitute(vim.fn.getline(start_line), "\t", string.rep(" ", tabstop), "g")
+    .. " ... "
+    .. vim.fn.trim(vim.fn.getline(end_line))
+    .. "  ( "
+    .. lines_in_fold
+    .. " lines) "
 end
 
 vim.o.foldtext = "v:lua.custom_fold_text()"
 
 vim.opt.fillchars = {
-	foldopen = "",
-	foldclose = "",
-	fold = "-",
-	foldsep = " ",
-	diff = "╱",
-	eob = " ",
+  foldopen = "", --  
+  foldclose = "", --  
+  fold = "-",
+  foldsep = " ",
+  diff = "╱",
+  eob = " ",
 }
 vim.o.foldcolumn = "1"
+
+vim.opt.spelllang = { "en", "cjk" }
+vim.o.helplang = "en"
 
 vim.g.loaded_python3_provider = 0
 vim.g.loaded_perl_provider = 0

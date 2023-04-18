@@ -48,27 +48,22 @@ vim.keymap.set("n", "]b", vim.cmd.bnext, { desc = "Move to next buffer" })
 -- Clear search with <esc>
 vim.keymap.set({ "i", "n" }, "<esc>", "<cmd>noh<cr><esc>", { desc = "Escape and clear hlsearch" })
 
--- Remap to keep search results in middle of screen
-vim.keymap.set("n", "n", "nzzzv")
-vim.keymap.set("n", "N", "Nzzzv")
-
 -- https://github.com/mhinz/vim-galore#saner-behavior-of-n-and-n
-vim.keymap.set("n", "n", "'Nn'[v:searchforward]", { expr = true, desc = "Next search result" })
-vim.keymap.set("x", "n", "'Nn'[v:searchforward]", { expr = true, desc = "Next search result" })
-vim.keymap.set("o", "n", "'Nn'[v:searchforward]", { expr = true, desc = "Next search result" })
-vim.keymap.set("n", "N", "'nN'[v:searchforward]", { expr = true, desc = "Prev search result" })
-vim.keymap.set("x", "N", "'nN'[v:searchforward]", { expr = true, desc = "Prev search result" })
-vim.keymap.set("o", "N", "'nN'[v:searchforward]", { expr = true, desc = "Prev search result" })
+vim.keymap.set({ "n", "x", "o" }, "n", "'Nn'[v:searchforward]", { expr = true, desc = "Next search result" })
+vim.keymap.set({ "n", "x", "o" }, "N", "'nN'[v:searchforward]", { expr = true, desc = "Prev search result" })
 
 -- save file
 vim.keymap.set({ "i", "v", "n", "s" }, "<C-s>", "<cmd>w<cr><esc>", { desc = "Save file" })
 
 -- better indenting
-vim.keymap.set("v", "<", "<gv", { desc = "Indent Line" })
-vim.keymap.set("v", ">", ">gv", { desc = "Outdent Line" })
+vim.keymap.set("v", "<", "<gv", { desc = "Outdent Line" })
+vim.keymap.set("v", ">", ">gv", { desc = "Indent Line" })
 
 vim.keymap.set("n", "<leader>xl", "<cmd>lopen<cr>", { desc = "Location List" })
 vim.keymap.set("n", "<leader>xq", "<cmd>copen<cr>", { desc = "Quickfix List" })
+
+--- remove all trailing spaces
+vim.keymap.set("n", "<F5>", "<cmd>lua require('utils').trim_whitespace()<CR>", { desc = "Remove trailing spaces" })
 
 -- :Wq, :WQ, :W, :Q to :wq, :wq, :w, :q
 vim.api.nvim_create_user_command("WQ", "wq", {})
