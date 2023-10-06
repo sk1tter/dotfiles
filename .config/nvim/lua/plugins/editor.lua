@@ -25,15 +25,18 @@ return {
   {
     -- Add indentation guides even on blank lines
     "lukas-reineke/indent-blankline.nvim",
+    main = "ibl",
     -- Enable `lukas-reineke/indent-blankline.nvim`
     -- See `:help indent_blankline.txt`
     event = { "BufReadPost", "BufNewFile" },
     opts = {
-      char = "│",
-      filetype_exclude = { "help", "Trouble", "lazy" },
-      show_trailing_blankline_indent = false,
-      show_current_context = false,
-      show_current_context_start = false,
+      indent = {
+        char = "│",
+        priority = 50,
+      },
+      scope = { enabled = false },
+      exclude = {filetypes = { "help", "Trouble", "lazy" }},
+      whitespace = { remove_blankline_trail = true },
     },
   },
 
@@ -50,15 +53,7 @@ return {
     event = { "BufReadPre", "BufNewFile" },
     opts = {},
   },
-  -- buffer remove
-  {
-    "echasnovski/mini.bufremove",
-    -- stylua: ignore
-    keys = {
-      { "<leader>bd", function() require("mini.bufremove").delete(0, false) end, desc = "[B]uffer [D]elete " },
-      { "<leader>bD", function() require("mini.bufremove").delete(0, true) end, desc = "[B]uffer [D]elete (Force)" },
-    },
-  },
+
   {
     "echasnovski/mini.map",
     config = function()
@@ -81,26 +76,53 @@ return {
         },
       })
     end,
+    -- stylua: ignore
     keys = {
-      { "<leader>mm", "<Cmd>lua MiniMap.toggle()<CR>", desc = "[M]ini[M]ap" },
-      { "<leader>mf", "<Cmd>lua MiniMap.toggle_focus()<CR>", desc = "[M]inimap [F]ocus" },
+      { "<leader>mm", function() require("mini.map").toggle() end, desc = "[M]ini[M]ap" },
+      { "<leader>mf", function() require("mini.map").toggle_focus() end, desc = "[M]inimap [F]ocus" },
     },
   },
-  -- markdown preview
+  -- folds
   {
-    "toppair/peek.nvim",
-    ft = "markdown",
-    build = "deno task --quiet build:fast",
-    opts = { theme = "light", app = "browser" },
-    config = function(_, opts)
-      require("peek").setup(opts)
-      vim.api.nvim_create_user_command("PreviewOpen", require("peek").open, { desc = "Open Markdown Preview"})
-      vim.api.nvim_create_user_command('PreviewClose', require('peek').close, { desc = "Close Markdown Preview"})
-    end
-  },
-  {
-    "folke/persistence.nvim",
-    event = "BufReadPre",
-    opts = { options = { "buffers", "curdir", "tabpages", "winsize", "help", "globals" } },
+    "kevinhwang91/nvim-ufo",
+    dependencies = "kevinhwang91/promise-async",
+    event = "BufReadPost",
+    -- stylua: ignore
+    init = function()
+      -- Using ufo provider need remap `zR` and `zM`. If Neovim is 0.6.1, remap yourself
+      vim.keymap.set("n", "zR", function() require("ufo").openAllFolds() end)
+      vim.keymap.set("n", "zM", function() require("ufo").closeAllFolds() end)
+    end,
+    config = function()
+      require("ufo").setup({
+        fold_virt_text_handler = function(virtText, lnum, endLnum, width, truncate)
+          local newVirtText = {}
+          local suffix = ("  %d "):format(endLnum - lnum)
+          local sufWidth = vim.fn.strdisplaywidth(suffix)
+          local targetWidth = width - sufWidth
+          local curWidth = 0
+          for _, chunk in ipairs(virtText) do
+            local chunkText = chunk[1]
+            local chunkWidth = vim.fn.strdisplaywidth(chunkText)
+            if targetWidth > curWidth + chunkWidth then
+              table.insert(newVirtText, chunk)
+            else
+              chunkText = truncate(chunkText, targetWidth - curWidth)
+              local hlGroup = chunk[2]
+              table.insert(newVirtText, { chunkText, hlGroup })
+              chunkWidth = vim.fn.strdisplaywidth(chunkText)
+              -- str width returned from truncate() may less than 2nd argument, need padding
+              if curWidth + chunkWidth < targetWidth then
+                suffix = suffix .. (" "):rep(targetWidth - curWidth - chunkWidth)
+              end
+              break
+            end
+            curWidth = curWidth + chunkWidth
+          end
+          table.insert(newVirtText, { suffix, "Fold" })
+          return newVirtText
+        end,
+      })
+    end,
   },
 }

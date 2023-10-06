@@ -5,6 +5,7 @@ end
 -- Start vim with clean jump list
 vim.api.nvim_create_autocmd({ "VimEnter" }, {
   pattern = "*",
+  once = true,
   group = augroup("clean_jumplist"),
   callback = function()
     vim.cmd.clearjumps()
@@ -54,22 +55,28 @@ local set_cursorline = function(event, value, pattern)
 end
 set_cursorline("WinLeave", false)
 set_cursorline("WinEnter", true)
-set_cursorline("FileType", false, "TelescopePrompt")
+set_cursorline("FileType", false, "TelecopePrompt")
 
 -- Go to last location when opening a buffer
-vim.api.nvim_create_autocmd({ "BufReadPost", "filetype" }, {
-  group = augroup("goto_last_location"),
-  callback = function()
-    local ignore_filetype = { "gitcommit", "gitrebase" }
-    local ignore_buftype = { "quickfix", "nofile", "help" }
-    if vim.tbl_contains(ignore_buftype, vim.bo.buftype) or vim.tbl_contains(ignore_filetype, vim.bo.filetype) then
-      return
-    end
-    local mark = vim.api.nvim_buf_get_mark(0, '"')
-    local lcount = vim.api.nvim_buf_line_count(0)
-    if mark[1] > 0 and mark[1] <= lcount then
-      pcall(vim.api.nvim_win_set_cursor, 0, mark)
-    end
+local restore_cursor_group = augroup("goto_last_location")
+vim.api.nvim_create_autocmd("BufReadPost", {
+  group = restore_cursor_group,
+  callback = function(opts)
+    vim.api.nvim_create_autocmd("FileType", {
+      group = restore_cursor_group,
+      once = true,
+      buffer = opts.buf,
+      callback = function()
+        local ft = vim.bo[opts.buf].ft
+        local mark = vim.api.nvim_buf_get_mark(opts.buf, '"')
+        if not vim.tbl_contains({ "gitcommit", "gitrebase" }, ft) then
+          local lcount = vim.api.nvim_buf_line_count(0)
+          if mark[1] > 0 and mark[1] <= lcount then
+            pcall(vim.api.nvim_win_set_cursor, 0, mark)
+          end
+        end
+      end,
+    })
   end,
 })
 
@@ -92,8 +99,12 @@ vim.api.nvim_create_autocmd("FileType", {
 -- start terminal in insert mode
 vim.api.nvim_create_autocmd("TermOpen", {
   group = augroup("terminal_open"),
-  pattern = "*",
-  command = "startinsert",
+  callback = function(event)
+    vim.opt_local.cursorline = false
+    vim.opt_local.number = false
+    vim.opt_local.relativenumber = false
+    vim.cmd.startinsert()
+  end,
 })
 
 -- Auto create dir when saving a file, in case some intermediate directory does not exist
@@ -112,3 +123,17 @@ vim.api.nvim_create_autocmd("FileType", {
     require("persistence").stop()
   end,
 })
+
+if vim.fn.executable("qlmanage") then
+  vim.api.nvim_create_autocmd("FileType", {
+    group = augroup("netrw_mapping"),
+    pattern = "netrw",
+    callback = function(event)
+      vim.keymap.set("n", "gl", function()
+        local filepath =
+          vim.api.nvim_exec2("echo netrw#Call('NetrwFile', netrw#Call('NetrwGetWord'))", { output = true })
+        vim.fn.jobstart({ "qlmanage", "-p", filepath["output"] })
+      end, { buffer = event.buf, silent = true, desc = "Preview in Quick Look" })
+    end,
+  })
+end

@@ -26,6 +26,7 @@ export PATH="/usr/local/bin:$PATH"
 
 export PYENV_ROOT="$HOME/.pyenv" 
 export PATH="$PYENV_ROOT/bin:$PATH" 
+export RUBY_CONFIGURE_OPTS="--with-openssl-dir=$(brew --prefix openssl@1.1)"
 eval "$(pyenv init --path)"
 eval "$(pyenv init -)"
 

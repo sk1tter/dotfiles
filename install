@@ -45,6 +45,7 @@ echo ""
 
 _files_to_symlink="
 .config/nvim
+.config/wezterm
 .zsh
 .zshrc
 .vimrc

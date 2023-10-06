@@ -1,6 +1,7 @@
 vim.g.neovide_cursor_trail_legnth = 0
 vim.g.neovide_cursor_animation_length = 0
 vim.g.neovide_input_use_logo = 1 -- enable use of the logo (cmd) key
+vim.g.neovide_remember_window_size = false
 
 vim.keymap.set("n", "<D-s>", ":w<CR>")
 

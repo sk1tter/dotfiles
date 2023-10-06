@@ -31,7 +31,7 @@ M.icons = {
   },
   gitsigns = {
     add = { text = "│" },
-    topdelete = { text = "󱨉" },
+    topdelete = { text = "⏵" },
     delete = { text = "│" },
     changedelete = { text = "│" },
     change = { text = "│" },
@@ -43,7 +43,7 @@ M.icons = {
 M.trim_whitespace = function()
   local pattern = [[%s/\s\+$//e]]
   local cur_view = vim.fn.winsaveview()
-  vim.api.nvim_exec2(string.format("keepjumps keeppatterns silent! %s", pattern), {})
+  vim.cmd(string.format("keepjumps keeppatterns silent! %s", pattern))
   vim.fn.winrestview(cur_view)
 end
 
@@ -56,10 +56,6 @@ M.greeter = function()
   local username = vim.loop.os_get_passwd()["username"] or "USERNAME"
 
   return ("Good %s, %s"):format(day_part, username)
-end
-
-M.weather = function()
-  return vim.trim(vim.fn.system("curl -s 'wttr.in?format=3'")):gsub("%s+", " ")
 end
 
 local spinners = { "⠋", "⠙", "⠹", "⠸", "⠼", "⠴", "⠦", "⠧", "⠇", "⠏" }
@@ -93,7 +89,7 @@ local lsp_main_client = function()
   if #clients_names == 0 then
     return ""
   end
-  return " :" .. table.concat(clients_names, ":")
+  return ":" .. table.concat(clients_names, ":")
 end
 
 M.is_wide_term = function(width)
@@ -117,10 +113,10 @@ M.lsp_progress = function()
 
   if M.is_wide_term(150) then
     local bar = progress_bar(progress, 10)
-    return " :" .. client .. task .. " " .. bar .. " " .. spinners[frame + 1]
+    return ":" .. client .. task .. " " .. bar .. " " .. spinners[frame + 1]
   end
 
-  return " :" .. client .. task .. " " .. progress .. "%% " .. " " .. spinners[frame + 1]
+  return ":" .. client .. task .. " " .. progress .. "%% " .. " " .. spinners[frame + 1]
 end
 
 -- copilot indicator
@@ -224,12 +220,29 @@ M.statusline_indent_guide = {
     return style .. ": " .. size
   end,
   cond = function()
-    local ignore_ft = { "gitcommit", "gitrebase", "alpha", "help", "TelescopePrompt", "vim", "" }
+    local ignore_ft = { "gitcommit", "gitrebase", "alpha", "help", "TelescopePrompt", "vim", "", "minimap" }
     return not vim.tbl_contains(ignore_ft, vim.bo.filetype)
   end,
   on_click = function(_)
     vim.cmd("Sleuth")
   end,
 }
+
+M.project_files = function()
+  local opts = {} -- define here if you want to define something
+  vim.fn.system("git rev-parse --is-inside-work-tree")
+  if vim.v.shell_error == 0 then
+    require("telescope.builtin").git_files(opts)
+  else
+    require("telescope.builtin").find_files(opts)
+  end
+end
+
+M.is_image = function(filepath)
+  local image_extensions = { "png", "jpg", "jpeg", "gif" } -- Supported image formats
+  local split_path = vim.split(filepath:lower(), ".", { plain = true })
+  local extension = split_path[#split_path]
+  return vim.tbl_contains(image_extensions, extension)
+end
 
 return M

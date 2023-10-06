@@ -1,13 +1,3 @@
-local project_files = function()
-  local opts = {} -- define here if you want to define something
-  vim.fn.system("git rev-parse --is-inside-work-tree")
-  if vim.v.shell_error == 0 then
-    require("telescope.builtin").git_files(opts)
-  else
-    require("telescope.builtin").find_files(opts)
-  end
-end
-
 return {
   {
     "nvim-telescope/telescope.nvim",
@@ -35,7 +25,7 @@ return {
     -- stylua: ignore
     keys = {
       -- See `:help telescope.builtin`
-      { "<leader>sf", project_files, --[[ git_files if git, else find_files ]] desc = "[S]earch [F]iles" },
+      { "<leader>sf", require("utils").project_files, --[[ git_files if git, else find_files ]] desc = "[S]earch [F]iles" },
       { "<leader>sh", function() require("telescope.builtin").help_tags() end, desc = "[S]earch [H]elp" },
       { "<leader>sw", function() require("telescope.builtin").grep_string() end, desc = "[S]earch current [W]ord" },
       { "<leader>sg", function() require("telescope.builtin").live_grep() end, desc = "[S]earch by [G]rep" },

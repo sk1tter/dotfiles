@@ -25,4 +25,7 @@ vim.opt.rtp:prepend(lazypath)
 require("config")
 
 -- Install plugins in `plugins`
-require("lazy").setup("plugins", { install = { colorscheme = { "nord" } } })
+require("lazy").setup("plugins", {
+  install = { colorscheme = { "nord" } },
+  defaults = { lazy = true },
+})

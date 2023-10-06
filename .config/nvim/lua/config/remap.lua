@@ -4,8 +4,8 @@
 -- See `:help vim.keymap.set()`
 vim.keymap.set({ "n", "v" }, "<Space>", "<Nop>", { silent = true })
 
-vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
-vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
+vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv", { desc = "Move selected lines up" })
+vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv", { desc = "Move selected lines down" })
 
 vim.keymap.set("n", "<leader>fv", vim.cmd.Ex, { desc = "[f]ile [v]iew" })
 
@@ -64,6 +64,17 @@ vim.keymap.set("n", "<leader>xq", "<cmd>copen<cr>", { desc = "Quickfix List" })
 
 --- remove all trailing spaces
 vim.keymap.set("n", "<F5>", "<cmd>lua require('utils').trim_whitespace()<CR>", { desc = "Remove trailing spaces" })
+
+if vim.fn.executable("qlmanage") then
+  vim.keymap.set("n", "gl", function()
+    local file = vim.fn.expand("<cfile>")
+    if not vim.loop.fs_stat(file) then
+      vim.notify("File: " .. file .. " not found", vim.log.levels.INFO)
+      return
+    end
+    vim.fn.jobstart({ "qlmanage", "-p", file })
+  end, { desc = "Quicklook" })
+end
 
 -- :Wq, :WQ, :W, :Q to :wq, :wq, :w, :q
 vim.api.nvim_create_user_command("WQ", "wq", {})

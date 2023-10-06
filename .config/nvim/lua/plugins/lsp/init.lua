@@ -47,6 +47,15 @@ return {
           source = "always", -- Or "if_many"
         },
       },
+      -- global capabilities
+      capabilities = {
+        textDocument = {
+          foldingRange = {
+            dynamicRegistration = false,
+            lineFoldingOnly = true,
+          },
+        },
+      },
       -- LSP Server Settings
       servers = {
         gopls = {
@@ -97,10 +106,13 @@ return {
     },
     config = function(_, opts)
       local servers = opts.servers
-      local capabilities = require("cmp_nvim_lsp").default_capabilities(vim.lsp.protocol.make_client_capabilities())
-
-      -- https://github.com/jose-elias-alvarez/null-ls.nvim/issues/428
-      capabilities.offsetEncoding = { "utf-16" }
+      local capabilities = vim.tbl_deep_extend(
+        "force",
+        {},
+        vim.lsp.protocol.make_client_capabilities(),
+        require("cmp_nvim_lsp").default_capabilities(),
+        opts.capabilities or {}
+      )
 
       -- Ensure the servers above are installed
       local mason_lspconfig = require("mason-lspconfig")
@@ -140,7 +152,7 @@ return {
       vim.diagnostic.config(opts.diagnositics)
       -- “Severity signs” are signs for severity levels of problems in your code.
       -- By default, they are E for Error, W for Warning, H for Hints, I for Informations.
-      local signs = require('utils').icons.diagnostics 
+      local signs = require("utils").icons.diagnostics
       for type, icon in pairs(signs) do
         local hl = "DiagnosticSign" .. type
         vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = hl })
@@ -150,19 +162,23 @@ return {
 
   -- formatting
   {
-    "jose-elias-alvarez/null-ls.nvim",
+    "nvimtools/none-ls.nvim",
     event = { "BufReadPre", "BufNewFile" },
     dependencies = { "williamboman/mason.nvim", "nvim-lua/plenary.nvim" },
     opts = function()
       local nls = require("null-ls")
       return {
         root_dir = require("null-ls.utils").root_pattern("go.mod", ".venv", "Makefile", ".git"),
+        on_attach = function(_, buf)
+          require("plugins.lsp.format").on_attach(_, buf)
+        end,
         sources = {
           nls.builtins.formatting.stylua,
           nls.builtins.formatting.shfmt,
           nls.builtins.formatting.isort,
           nls.builtins.formatting.black,
           nls.builtins.formatting.gofmt,
+          nls.builtins.formatting.prettier,
         },
       }
     end,
@@ -171,7 +187,8 @@ return {
   -- Useful status updates for LSP
   {
     "j-hui/fidget.nvim",
-    event = { "LspAttach" },
+    tag = "legacy",
+    event = "LspAttach",
     opts = {
       sources = {
         ["null-ls"] = { ignore = false },
@@ -186,5 +203,5 @@ return {
     "microsoft/python-type-stubs",
     version = false,
     lazy = true,
-  }
+  },
 }

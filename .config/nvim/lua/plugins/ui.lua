@@ -18,7 +18,7 @@ return {
     -- stylua: ignore
     keys = {
       { "<leader>gb",  function() require("gitsigns").blame_line{full=true} end,       desc = "[g]it [b]lame" },
-      { "<leader>tgb", function() require("gitsigns").toggle_current_line_blame() end, desc = "[t]oggle [g]it [b]lame" },
+      { "<leader>gt",  function() require("gitsigns").toggle_current_line_blame() end, desc = "[g]it blame [t]oggle" },
       { "<leader>gd",  function() require("gitsigns").preview_hunk() end,              desc = "[g]it [d]iff" },
       { "[c",          function() require("gitsigns").prev_hunk() end,                 desc = "Next git hunk" },
       { "]c",          function() require("gitsigns").next_hunk() end,                 desc = "Previous git hunk" },
@@ -228,7 +228,7 @@ return {
   -- statuscolumn
   {
     "luukvbaal/statuscol.nvim",
-    -- event = "VeryLazy",
+    event = "VeryLazy",
     opts = function()
       local builtin = require("statuscol.builtin")
       local is_active_window = function(args)
@@ -237,7 +237,7 @@ return {
       return {
         setopt = true,
         relculright = false,
-        ft_ignore = { "terminal", "help", "vim", "Trouble", "lazy", "nofile" },
+        ft_ignore = { "terminal", "help", "vim", "Trouble", "lazy", "nofile", "minimap" },
         bt_ignore = { "terminal", "quickfix", "lazy", "nofile" },
         segments = {
           { --[[ Fold Column ]]
@@ -266,7 +266,7 @@ return {
 
   {
     "SmiteshP/nvim-navic",
-    event = "VeryLazy",
+    event = "LspAttach",
     opts = function()
       return {
         separator = " > ",

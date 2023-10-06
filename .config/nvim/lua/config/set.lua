@@ -23,7 +23,6 @@ vim.o.showbreak = string.rep(" ", 3) -- Make it so that long lines wrap smartly
 vim.o.linebreak = true
 
 -- persistent undo
-vim.o.undodir = os.getenv("HOME") .. "/.vim/undodir"
 vim.o.undofile = true
 
 -- Case insensitive searching UNLESS /C or capital in search
@@ -76,6 +75,7 @@ vim.o.pumblend = 15 -- Transparent background 0 ~ 100
 
 -- Folds
 vim.o.foldlevel = 99 -- high flodlevel means all folds are open
+vim.o.foldlevelstart = 99
 vim.o.foldmethod = "expr"
 
 -- ex) function _G.custom_fold_text() ... end  ( 12 lines ) ----------------------
@@ -95,11 +95,11 @@ end
 vim.o.foldtext = "v:lua.custom_fold_text()"
 
 vim.opt.fillchars = {
-  foldopen = "", --  
-  foldclose = "", --  
+  foldopen = "", -- ▼  
+  foldclose = "", -- ⏵  
   fold = "-",
   foldsep = " ",
-  diff = "╱",
+  diff = "/",
   eob = " ",
 }
 vim.o.foldcolumn = "1"

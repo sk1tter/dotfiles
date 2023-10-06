@@ -14,9 +14,10 @@ return {
       "zbirenbaum/copilot-cmp",
       "onsails/lspkind.nvim",
     },
-    config = function()
+    opts = function()
       local cmp = require("cmp")
       local luasnip = require("luasnip")
+      local defaults = require("cmp.config.default")()
       -- Nice formatting for lsp sources
       local lspkind = require("lspkind")
       lspkind.init({
@@ -24,9 +25,14 @@ return {
           Copilot = "",
         },
       })
-      vim.api.nvim_set_hl(0, "CmpItemKindCopilot", { fg = "#b48ead" })
 
-      cmp.setup({
+      vim.api.nvim_set_hl(0, "CmpItemKindCopilot", { fg = "#b48ead" })
+      vim.api.nvim_set_hl(0, "CmpGhostText", { link = "Comment", default = true })
+
+      return {
+        completion = {
+          completeopt = "menu,menuone,noinsert",
+        },
         preselect = cmp.PreselectMode.None,
         snippet = {
           expand = function(args)
@@ -96,12 +102,17 @@ return {
             },
           }),
         },
-      })
+        experimental = {
+          ghost_text = {
+            hl_group = "CmpGhostText",
+          },
+        },
+        sorting = defaults.sorting,
+      }
     end,
   },
   {
     "L3MON4D3/LuaSnip",
-    lazy = true,
     build = (not jit.os:find("Windows"))
         and "echo -e 'NOTE: jsregexp is optional, so not a big deal if it fails to build\n'; make install_jsregexp"
       or nil,
@@ -173,7 +184,6 @@ return {
   },
   {
     "zbirenbaum/copilot-cmp",
-    lazy = true,
     dependencies = { "copilot.lua" },
     config = function()
       require("copilot_cmp").setup()

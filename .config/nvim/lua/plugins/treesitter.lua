@@ -88,7 +88,7 @@ return {
       -- See `:help nvim-treesitter`
       require("nvim-treesitter.configs").setup(opts)
       -- fold with treesitter
-      vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
+      -- vim.opt.foldexpr = "nvim_treesitter#foldexpr()"
     end,
   },
   -- {

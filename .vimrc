@@ -40,6 +40,14 @@ set report=0
 set synmaxcol=200
 
 set noswapfile
+set helplang=en
+
+set undodir=~/.vim/undodir
+set undofile
+
+if &t_Co > 16
+    set termguicolors
+endif
 
 nnoremap <C-j> <C-W>j
 nnoremap <C-k> <C-W>k
@@ -54,8 +62,6 @@ vnoremap K :m '<-2<CR>gv=gv
 
 nnoremap <expr> j v:count ? 'j' : 'gj'
 nnoremap <expr> k v:count ? 'k' : 'gk'
-vnoremap <expr> j v:count ? 'j' : 'gj'
-vnoremap <expr> k v:count ? 'k' : 'gk'
 
 nnoremap <leader>fv :Ex<CR>
 
@@ -125,4 +131,6 @@ function! s:number_control(value) abort
   endif
 endfunction
 
+autocmd! BufReadPost *
+ \ if &ft !~# 'commit\|rebase' && line("'\"") > 1 && line("'\"") <= line("$") | exe 'normal! g`"' | endif
 

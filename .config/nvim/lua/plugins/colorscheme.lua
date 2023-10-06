@@ -2,8 +2,8 @@
 return {
   {
     "shaunsingh/nord.nvim",
-    priority = 1000,
     enabled = true,
+    lazy = false,
     config = function()
       vim.g.nord_contrast = true
       vim.g.nord_borders = true
@@ -16,34 +16,25 @@ return {
     end,
   },
   {
+    "rebelot/kanagawa.nvim",
+    lazy = false,
+  },
+  {
     "folke/tokyonight.nvim",
-    enabled = false,
-    priority = 1000,
-    config = function()
-      vim.cmd.colorscheme("tokyonight")
-    end,
+    lazy = false,
   },
   {
     "catppuccin/nvim",
     name = "catppuccin",
-    enabled = false,
-    priority = 1000,
-    config = function()
-      vim.cmd.colorscheme("catppuccin")
-    end,
+    lazy = false,
   },
   {
     "EdenEast/nightfox.nvim",
-    enabled = false,
-    priority = 1000,
-    config = function()
-      vim.cmd.colorscheme("nightfox")
-    end,
+    lazy = false,
   },
   { -- Theme inspired by Atom
     "navarasu/onedark.nvim",
-    enabled = true,
-    priority = 1000,
+    lazy = false,
     config = function()
       if vim.g.neovide then
         vim.cmd.colorscheme("onedark")
