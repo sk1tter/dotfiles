@@ -253,7 +253,7 @@ return {
             text = { builtin.lnumfunc },
           },
           { --[[ git ]]
-            sign = { name = { "GitSigns" }, maxwidth = 1, colwidth = 1, auto = false },
+            sign = { namespace = { "gitsigns" }, maxwidth = 1, colwidth = 1, auto = false },
             click = "v:lua.ScSa",
           },
         },

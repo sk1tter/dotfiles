@@ -95,6 +95,8 @@ return {
     end,
     config = function()
       require("ufo").setup({
+        open_fold_hl_timeout = 400,
+        close_fold_kinds = {},
         fold_virt_text_handler = function(virtText, lnum, endLnum, width, truncate)
           local newVirtText = {}
           local suffix = ("  %d "):format(endLnum - lnum)
@@ -122,6 +124,8 @@ return {
           table.insert(newVirtText, { suffix, "Fold" })
           return newVirtText
         end,
+        enable_get_fold_virt_text = false,
+        preview = {}
       })
     end,
   },
