@@ -1,14 +1,14 @@
 -- Color Scheme
 return {
   {
-    "shaunsingh/nord.nvim",
+    "gbprod/nord.nvim",
     enabled = true,
     lazy = false,
     config = function()
-      vim.g.nord_contrast = true
-      vim.g.nord_borders = true
-      vim.g.nord_italic = false
-      vim.g.nord_bold = true
+      -- vim.g.nord_contrast = true
+      -- vim.g.nord_borders = true
+      -- vim.g.nord_italic = false
+      -- vim.g.nord_bold = true
 
       if not vim.g.neovide then
         vim.cmd.colorscheme("nord")

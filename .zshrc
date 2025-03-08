@@ -21,6 +21,8 @@ export PATH=$PATH:$GOPATH/bin
 export PATH=$PATH:$GOROOT/bin
 export PATH=$HOME/.local/bin:$PATH
 
+export PATH=$PATH:/usr/local/texlive/2024basic/bin/universal-darwin
+
 export PATH="$HOME/.pyenv/bin:$PATH"
 export PATH="/usr/local/bin:$PATH"
 
@@ -64,9 +66,9 @@ alias l='ls -alF'
 alias ll='ls -l'
 alias vi='\vim'
 alias vim='\nvim'
-alias nvim='neovide'
 eval "$(hub alias -s)"
 alias which="command which"
+alias brew='env PATH="${PATH//$(pyenv root)\/shims:/}" brew'
 
 # pretty git graph
 alias gitv='git log --graph --format="%C(auto)%h%d %s %C(black)%C(bold)%cr"'

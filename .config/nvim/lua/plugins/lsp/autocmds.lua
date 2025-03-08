@@ -53,6 +53,15 @@ function M.on_attach(client, bufnr)
       callback = vim.lsp.buf.clear_references,
     })
   end
+
+  if client.server_capabilities.inlayHintProvider then
+    local ih = vim.lsp.buf.inlay_hint or vim.lsp.inlay_hint
+    if type(ih) == "function" then
+      ih(bufnr, true)
+    elseif type(ih) == "table" and ih.enable then
+      ih.enable(true, { bufnr = bufnr })
+    end
+  end
 end
 
 return M

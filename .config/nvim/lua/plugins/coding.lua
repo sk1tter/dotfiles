@@ -44,54 +44,34 @@ return {
           ["<C-f>"] = cmp.mapping.scroll_docs(4),
           ["<C-x>"] = cmp.mapping.abort(),
           ["<C-Space>"] = cmp.mapping.complete(),
-          ["<CR>"] = cmp.mapping({
-            i = function(fallback)
-              if cmp.visible() and cmp.get_active_entry() then
-                cmp.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = false })
-              else
-                fallback()
-              end
-            end,
-            s = cmp.mapping.confirm({ select = true }),
-            c = function(fallback)
-              if cmp.visible() and cmp.get_selected_entry() then
-                cmp.confirm({ behavior = cmp.ConfirmBehavior.Replace, select = true })
-              else
-                fallback()
-              end
-            end,
-          }),
-          ["<Tab>"] = cmp.mapping(function(fallback)
-            if cmp.visible() then
-              cmp.select_next_item()
-            elseif luasnip.expand_or_jumpable() then
+
+          ['<CR>'] = cmp.mapping.confirm { select = true },
+          ['<Tab>'] = cmp.mapping.select_next_item(),
+          ['<S-Tab>'] = cmp.mapping.select_prev_item(),
+
+          ['<C-l>'] = cmp.mapping(function()
+            if luasnip.expand_or_locally_jumpable() then
               luasnip.expand_or_jump()
-            else
-              fallback()
             end
-          end, { "i", "s" }),
-          ["<S-Tab>"] = cmp.mapping(function(fallback)
-            if cmp.visible() then
-              cmp.select_prev_item()
-            elseif luasnip.jumpable(-1) then
+          end, { 'i', 's' }),
+          ['<C-h>'] = cmp.mapping(function()
+            if luasnip.locally_jumpable(-1) then
               luasnip.jump(-1)
-            else
-              fallback()
             end
-          end, { "i", "s" }),
+          end, { 'i', 's' }),
         }),
         sources = cmp.config.sources({
           { name = "copilot" },
           { name = "nvim_lsp" },
           { name = "luasnip" },
         }, {
-          { name = "path", max_item_count = 10 },
-          { name = "buffer", max_item_count = 10 },
+          { name = "path",   max_item_count = 5 },
+          { name = "buffer", max_item_count = 5 },
         }),
         formatting = {
           format = lspkind.cmp_format({
             with_text = true,
-            maxwidth = 50, -- prevent the popup from showing more than provided characters (e.g 50 will not show more than 50 characters)
+            maxwidth = 50,         -- prevent the popup from showing more than provided characters (e.g 50 will not show more than 50 characters)
             ellipsis_char = "...", -- when popup menu exceed maxwidth, the truncated part would show ellipsis_char instead (must define maxwidth first)
             menu = {
               buffer = "[buf]",
@@ -102,11 +82,11 @@ return {
             },
           }),
         },
-        experimental = {
-          ghost_text = {
-            hl_group = "CmpGhostText",
-          },
-        },
+        -- experimental = {
+        --   ghost_text = {
+        --     hl_group = "CmpGhostText",
+        --   },
+        -- },
         sorting = defaults.sorting,
       }
     end,
@@ -115,7 +95,7 @@ return {
     "L3MON4D3/LuaSnip",
     build = (not jit.os:find("Windows"))
         and "echo -e 'NOTE: jsregexp is optional, so not a big deal if it fails to build\n'; make install_jsregexp"
-      or nil,
+        or nil,
     dependencies = {
       "rafamadriz/friendly-snippets",
       config = function()

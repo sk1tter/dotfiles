@@ -123,6 +123,7 @@ return {
                 -- local venv = get_venv("VIRTUAL_ENV") or "System"
                 local venv = utils.parse_venv(os.getenv("VIRTUAL_ENV"))
                   or utils.parse_venv(utils.pyright_python())
+                  or utils.parse_venv(utils.based_pyright_python())
                   or "System"
                 return "󰌠 " .. venv
               end,
@@ -270,7 +271,7 @@ return {
     opts = function()
       return {
         separator = " > ",
-        highlight = true,
+        highlight = false,
         depth_limit = 5,
         depth_limit_indicator = "..",
         lsp = { auto_attach = true },

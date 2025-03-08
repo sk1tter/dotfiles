@@ -77,7 +77,7 @@ end
 
 -- match lsp with buffer filetype
 local lsp_main_client = function()
-  local clients = vim.lsp.get_active_clients()
+  local clients = vim.lsp.get_clients()
   local buf_ft = vim.bo.filetype
   local clients_names = {}
   for _, client in ipairs(clients) do
@@ -100,7 +100,7 @@ end
 -- lsp progress for statusline
 M.lsp_progress = function()
   -- via https://www.reddit.com/r/neovim/comments/o4bguk/comment/h2kcjxa/
-  local messages = vim.lsp.util.get_progress_messages()
+  local messages = vim.lsp.status()
   if #messages == 0 then
     return lsp_main_client()
   end
@@ -121,7 +121,7 @@ end
 
 -- copilot indicator
 M.copilot_indicator = function()
-  local client = vim.lsp.get_active_clients({ name = "copilot" })[1]
+  local client = vim.lsp.get_clients({ name = "copilot" })[1]
   if client == nil then
     return ""
   end
@@ -136,13 +136,25 @@ M.copilot_indicator = function()
 end
 
 M.pyright_python = function()
-  local pyright = vim.lsp.get_active_clients({ name = "pyright" })[1]
+  local pyright = vim.lsp.get_clients({ name = "pyright" })[1]
   if pyright == nil then
     return nil
   end
   local pyright_path = pyright.config.settings.python.pythonPath
   if pyright_path ~= nil then
     return string.gsub(pyright_path, "/bin/python", "")
+  end
+  return nil
+end
+
+M.based_pyright_python = function()
+  local bpyright = vim.lsp.get_clients({ name = "basedpyright" })[1]
+  if bpyright == nil then
+    return nil
+  end
+  local bpyright_path = bpyright.config.settings.python.pythonPath
+  if bpyright_path ~= nil then
+    return string.gsub(bpyright_path, "/bin/python", "")
   end
   return nil
 end

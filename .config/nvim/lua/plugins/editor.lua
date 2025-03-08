@@ -40,13 +40,6 @@ return {
     },
   },
 
-  -- "gc" to comment visual regions/lines
-  {
-    "numToStr/Comment.nvim",
-    event = { "BufReadPre", "BufNewFile" },
-    opts = {},
-  },
-
   -- auto pair brackets
   {
     "windwp/nvim-autopairs",
@@ -96,7 +89,7 @@ return {
     config = function()
       require("ufo").setup({
         open_fold_hl_timeout = 400,
-        close_fold_kinds = {},
+        close_fold_kinds_for_ft = {},
         fold_virt_text_handler = function(virtText, lnum, endLnum, width, truncate)
           local newVirtText = {}
           local suffix = ("  %d "):format(endLnum - lnum)
@@ -125,8 +118,17 @@ return {
           return newVirtText
         end,
         enable_get_fold_virt_text = false,
-        preview = {}
+        preview = {},
       })
     end,
   },
+  {
+    "lervag/vimtex",
+    lazy=false,
+    init = function()
+      vim.g.vimtex_view_method = "skim"
+      vim.g.vimtex_skim_sync = 1
+      vim.g.vimtex_skim_activate = 1
+    end
+  }
 }
